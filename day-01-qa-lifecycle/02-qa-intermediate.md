@@ -227,27 +227,6 @@ Through this exercise, I learned to:
 
 **This ticket is a hypothetical practice example, not a reproduced application defect.** I completed the space setup and ticket creation; fixing and retesting remain future exercises.
 
-## 12. My Intermediate-Level Checklist
-
-- [ ] I can explain unit, integration, system, and acceptance testing.
-- [ ] I can explain why smoke testing comes before detailed testing when a new build arrives.
-- [ ] I can distinguish smoke, sanity, retesting, and regression testing.
-- [ ] I can identify positive and negative payment scenarios.
-- [ ] I can write clear expected results based on approved requirements.
-- [ ] I understand the purpose of exploratory and non-functional testing.
-- [ ] I can describe a pull request, review comments, approvals, and merging.
-- [ ] I understand how Jira issue keys can connect requirements, bugs, commits, and PRs.
-- [ ] I know that sandbox payment data must be used for authorized testing, not real card details.
-
-## 13. Questions I Would Ask My Senior QA
-
-1. What are the required smoke tests before a new development build is accepted for detailed testing?
-2. How does our team distinguish sanity testing from retesting?
-3. Which payment outcomes and statuses are defined in the project's PRD?
-4. How do we simulate gateway declines, insufficient funds, timeouts, and asynchronous callbacks safely?
-5. What are the review and approval requirements for QA pull requests?
-6. Is Jira linked to the training Bitbucket repository, and what issue-key naming convention should I follow?
-
 ## 14. My Key Takeaway
 
 **I now understand that a QA engineer does not simply ask, “Can the customer pay?”** I need to ask whether the complete payment journey is correct, what happens when the payment fails, whether amounts and order states remain consistent, whether users have proper access, and whether the new change affects existing features.
