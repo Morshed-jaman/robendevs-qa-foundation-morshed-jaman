@@ -36,3 +36,15 @@ I learned that tests should be balanced across three main levels:
 After a developer's pull request is reviewed and merged into the **development branch**, the build is deployed to the **DEV environment**. QA tests it, reports bugs in **Jira**, and retests fixes. Once checks pass, the release candidate moves to **Staging** for final validation; an approved release goes to **Production**, where monitoring continues.
 
 **Overall learning:** Quality is built through early reviews, appropriate test coverage, controlled Git changes, and continuous feedback.
+
+## References I read
+
+1. Vocke, H. (2018). [The Practical Test Pyramid](https://martinfowler.com/articles/practical-test-pyramid.html). Martin Fowler's website. — Test pyramid and test levels.
+
+2. Microsoft Learn. [Shift testing left with unit tests](https://learn.microsoft.com/en-us/devops/develop/shift-left-make-testing-fast-reliable). — Shift-left testing.
+
+3. Microsoft Learn. [Shift right to test in production](https://learn.microsoft.com/en-us/devops/deliver/shift-right-test-production). — Shift-right testing and monitoring.
+
+4. GitHub Docs. [Merge conflicts](https://docs.github.com/en/pull-requests/reference/merge-conflicts). — Why conflicts occur and how to resolve them.
+
+5. Git Documentation. [git-rebase](https://git-scm.com/docs/git-rebase). — Rebase behavior and conflict handling.
