@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — ACT-01 baseline login PASS; 1/15 action runs verified**
+**Status:** **IN PROGRESS — ACT-01 baseline PASS; ACT-02 dashboard navigation observed (Console and request Headers pending); 1/15 runs fully verified**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The ACT-01 baseline row now contains real Network and Console evidence from 16 November 2026; the remaining 14 planned action runs remain **NOT RUN**. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The ACT-01 baseline row now contains real Network and Console evidence from 16 November 2026; ACT-02 has its Network request-list screenshot and displayed Dashboard, but the Console and selected-request Headers have not yet been checked. The remaining 13 runs are **NOT RUN**. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -75,7 +75,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 | Action | Relevant request(s) | Method & HTTP status | Actual UI observation | Console errors | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | ACT-01 — Login | `/web/index.php/auth/validate` → `/web/index.php/dashboard/index` | `POST` **302 Found** → `GET` **200 OK** | Dashboard rendered after login | **No errors or warnings visible** in captured Console view | Headers + Console screenshots supplied in conversation; no repository image files yet; exclude sensitive Payload screenshot | **PASS — baseline login flow** |
-| ACT-02 — Dashboard | — | — | — | Not checked | — | **NOT RUN** |
+| ACT-02 — Dashboard | PIM navigation `viewPimModule` → `viewEmployeeList`; return via dashboard `index` | Request list shows **302**, **200**, then dashboard **200**; methods not yet verified in Headers | Dashboard visibly displayed after returning from PIM | **Not checked for ACT-02** | Conversation screenshot showing Network request list and Dashboard; not yet added to repository | **PARTIAL — Console and Headers pending** |
 | ACT-03 — PIM | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-05 — Logout | — | — | — | Not checked | — | **NOT RUN** |
@@ -95,7 +95,17 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Still to record:** exact browser version and screenshots added as repository evidence if submitting the final assessment. **ACT-02 is still pending as a distinct user-initiated dashboard action**; the redirect navigation above belongs to ACT-01.
 - **Evidence protection:** The Payload screenshot visibly includes the login password and a form token. **Do not publish that screenshot as-is.** Redact these values or use only the safe Headers screenshot.
 
-**ACT-02 through ACT-05:** NOT RUN for this Day 6 baseline.
+**ACT-03 through ACT-05:** NOT RUN for this Day 6 baseline. **ACT-02:** Network/UI evidence partially recorded; Console and selected Headers still needed.
+
+### ACT-02 — Dashboard navigation: partial evidence (16 November 2026)
+
+- **Action:** The user navigated to the PIM employee list, then returned to Dashboard in OrangeHRM.
+- **Visible request list:** `viewPimModule` **302**, `viewEmployeeList` **200**, `index` **200** (the Status column was visible).
+- **Other Network observation:** The `messages` request showed **304 Not Modified**, which can be normal cache revalidation and is not a defect by itself.
+- **UI result:** Dashboard appeared after navigation, with widgets visible.
+- **Test setup:** **No throttling**, **Keep log** enabled; **Disable cache** unchecked.
+- **Not yet captured:** Selected `index` request's Headers confirming method/URL, new Console check for this action, exact Edge version, and a sanitized screenshot file committed to the repository.
+- **Assessment status:** **PARTIAL**, not an independently completed full run. The PIM navigation is supporting context; ACT-03 should still be independently checked and documented as its own action.
 
 ## 6. Run B — Throttled Network
 
@@ -174,9 +184,9 @@ Use this for each of the **15 planned runs**.
 | --- | --- | --- | --- |
 | Fully verified actions | **1/5 (ACT-01)** | 0/5 | 0/5 |
 | Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | Pending | Pending |
-| Main UI differences | Pending | Pending | Pending |
+| Main UI differences | ACT-02 returned to Dashboard successfully; other actions pending | Pending | Pending |
 | Console errors | **ACT-01: none visible in captured Console** | Not checked | Not checked |
-| Recorded request statuses | ACT-01 `POST 302` and `GET 200`; other actions pending | Pending | Pending |
+| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 request list `302`, `200`, `200` (Headers still pending) | Pending | Pending |
 | Real defects confirmed | **None established yet** | **None established yet** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
