@@ -130,7 +130,7 @@ For the Petstore pet example, the safest workflow is:
 | POS-09 | POST | `/store/order` (ID `2026111609`) | 200 | 3/3 | PASS |
 | POS-10 | GET | `/store/order/2026111609` | 200 | 3/3 | PASS |
 
-These results reflect screenshots shared during the Day 7 practice. **11 distinct Postman requests** have been executed so far, with **32 passing assertions across individual test runs** (3+3+3+3+3+3+2+2+3+3+3). This total is not a claim that all 11 requests ran in a single Collection Runner session.
+These results reflect screenshots shared during the Day 7 practice. **11 distinct Postman requests** have been executed so far, with **31 passing assertions across individual test runs** (3+3+3+3+3+3+2+2+3+3+3). This total is not a claim that all 11 requests ran in a single Collection Runner session.
 
 ### Collection Runner evidence
 
