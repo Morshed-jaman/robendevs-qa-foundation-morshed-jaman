@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — 10 actions PASS; cleared-storage ACT-01 attempted, blocked by CSRF token validation; four further cleared-storage actions pending**
+**Status:** **IN PROGRESS — 11 action runs completed; Run C ACT-01 login passed on retry after CSRF validation failure; four cleared-storage actions pending**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01 through ACT-05 rows have observed Network/UI evidence from 16 November 2026. **Four cleared-storage action runs are NOT RUN**; Run C ACT-01 was attempted but did not complete login because a CSRF validation message appeared. Actual storage-clearing completion is not yet independently verified. The five 3G-throttled actions have observed Network and UI evidence from the 16 November 2026 screenshots. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. Individual 3G request timings are recorded from DevTools screenshots, not invented page-load metrics; screenshot files themselves are not yet committed.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01 through ACT-05 rows have observed Network/UI evidence from 16 November 2026. **Four cleared-storage action runs are NOT RUN**. Run C ACT-01 first failed with a CSRF validation message, but a fresh-page login retry succeeded; actual storage-clearing completion was not independently verified. Actual storage-clearing completion is not yet independently verified. The five 3G-throttled actions have observed Network and UI evidence from the 16 November 2026 screenshots. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. Individual 3G request timings are recorded from DevTools screenshots, not invented page-load metrics; screenshot files themselves are not yet committed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -185,7 +185,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 
 | Action | Relevant request(s) | Method & HTTP status | Storage/login state & actual UI observation | Console errors | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| ACT-01 — Login | `/web/index.php/auth/validate` → `/web/index.php/auth/login` | **POST 302 Found**; login page **GET 200** shown in request list | Login page displays **“CSRF token validation failed”**; no dashboard access. The Storage panel showed selected clearing categories before this attempt, but successful clearing was not separately verified | Not checked in Run C screenshots | Login-screen error and selected `validate` Headers screenshots supplied in conversation; images not in repo | **BLOCKED / RECHECK AFTER FRESH PAGE RELOAD** |
+| ACT-01 — Login | First `POST /auth/validate` → `/auth/login`; retry `POST /auth/validate` → `/dashboard/index` | **POST 302** on both attempts, but redirect destinations differed; retry dashboard displayed (follow-up GET status not separately inspected) | Initial login showed **“CSRF token validation failed”**; after page reload, login succeeded and Dashboard appeared. Actual storage clearing remains unverified | **No errors visible** in retry Console screenshot | Error screenshot, retry Headers and Console screenshots shared in conversation; files not in repository | **PASS ON RETRY — initial CSRF error retained as observation** |
 | ACT-02 — Dashboard | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-03 — PIM | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
@@ -193,7 +193,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 
 **Storage-clearing selection observed:** Application → Storage for `https://opensource-demo.orangehrmlive.com/`; checkboxes were selected for Cache storage, File system, IndexedDB, Local and session storage, Cookies, and Unregister service workers; Third-party cookies unchecked. **The actual click/result of “Clear selected” was not shown**, so completion remains unverified.  
 **Cache also cleared?:** Cache storage was selected, but actual clearing outcome not independently confirmed.  
-**Cleared-storage finding:** First subsequent login attempt displayed “CSRF token validation failed”; see investigation below.
+**Cleared-storage finding:** First attempted login displayed “CSRF token validation failed”; after a fresh-page reload, the following login redirected to Dashboard successfully. Storage-clearing confirmation remains incomplete.
 
 **QA interpretation:** A redirect back to login after clearing auth cookies can be expected. Only report a bug if actual behaviour violates an established requirement.
 
@@ -205,9 +205,9 @@ The site is a **public practice demo**. I will use its supported demo account, a
 
 **Interpretation:** A stale CSRF token after changes to cookies/session is a plausible explanation, but **not a confirmed root cause**. The application correctly refused a submission that it reported as invalid. This is **not yet a verified Jira defect**.
 
-**Safe follow-up:** Reload the login page (`Ctrl+R`) to obtain a fresh form and CSRF token, then retry valid demo login with DevTools Network/Console open. If it succeeds, document recovery and the initial failure. If the failure persists, inspect cookie/session behaviour and capture a reproducible sequence before triage.
+**Retry performed:** A fresh-page login was attempted with **No throttling**. Selected `validate` request Headers showed **POST 302 Found** with `Location: /web/index.php/dashboard/index`; the Dashboard was visibly displayed. A separate Console screenshot showed no visible errors. This supports successful login recovery, although the Dashboard document's HTTP status was not selected in this retry.
 
-**Current verdict:** **BLOCKED — fresh-form retry pending**; not PASS, not an established application FAIL. Screenshots remain in the conversation and have not been committed as files.
+**Current verdict:** **PASS ON RETRY** for the observed login-to-Dashboard behaviour. The initial CSRF failure remains documented and is **not yet a confirmed bug** or established root cause. Neither the actual storage-clearing result nor an exact cookie inventory has been verified. Screenshots remain in the conversation and are not committed as files.
 
 ## 8. Individual Evidence Record Template
 
@@ -248,11 +248,11 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Observed completed actions | **5/5** | **5/5** (search Console capture pending) | **0/5 completed; ACT-01 attempted and blocked** |
-| Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | **POST 302 → dashboard GET 200; visible success** | **POST 302 → login page; CSRF token validation failed; recheck pending** |
+| Observed completed actions | **5/5** | **5/5** (search Console capture pending) | **1/5 — ACT-01 passed on retry** |
+| Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | **POST 302 → dashboard GET 200; visible success** | **First POST 302 → login with CSRF error; retry POST 302 → dashboard, visible success** |
 | Main UI differences | Dashboard/PIM loaded, search matched API JSON, logout returned to login page | Same features loaded; request durations were longer in recorded examples; demo employee records differed | Pending |
-| Console errors | **ACT-01–05: none visible in captured views; ACT-05 indicated 1 hidden message** | **No errors visible** in available Console captures; ACT-04 not independently captured; ACT-05 indicated 1 hidden message | Not checked |
-| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | Pending |
+| Console errors | **ACT-01–05: none visible in captured views; ACT-05 indicated 1 hidden message** | **No errors visible** in available Console captures; ACT-04 not independently captured; ACT-05 indicated 1 hidden message | **ACT-01 retry: no errors visible**; others not checked |
+| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | **ACT-01 initial POST 302 → login; retry POST 302 → dashboard** |
 | Real defects confirmed | **None established** | **None established** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
@@ -276,7 +276,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Current outcome:** **Five normal-network actions and five 3G-throttled actions visibly passed their primary navigation/search checks**, with HTTP methods/statuses recorded. The throttled employee search took about **2.88 s**, versus about **619 ms** in the earlier normal-network example, but changing public-demo data makes this an indicative comparison only. Some Console evidence remains qualified (one hidden logout message, no independent search Console capture). **Run C ACT-01 was attempted but blocked by an observed CSRF validation message; ACT-02–ACT-05 remain NOT RUN.** Evidence screenshots still need selected, sanitized uploads to GitHub.
+**Current outcome:** **Five normal-network actions and five 3G-throttled actions visibly passed their primary navigation/search checks**, with HTTP methods/statuses recorded. The throttled employee search took about **2.88 s**, versus about **619 ms** in the earlier normal-network example, but changing public-demo data makes this an indicative comparison only. Some Console evidence remains qualified (one hidden logout message, no independent search Console capture). **Run C ACT-01 initially showed a CSRF validation error but succeeded after a fresh-page login retry; ACT-02–ACT-05 remain NOT RUN.** Evidence screenshots still need selected, sanitized uploads to GitHub.
 
 ## References
 
