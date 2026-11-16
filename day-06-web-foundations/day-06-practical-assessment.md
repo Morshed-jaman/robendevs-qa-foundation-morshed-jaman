@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — ACT-01 through ACT-04 baseline PASS; 4/15 action runs verified**
+**Status:** **IN PROGRESS — all five normal-network actions PASS; 5/15 action runs verified**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01, ACT-02 and ACT-03 rows contain real Network/Console screenshots from 16 November 2026. The remaining **11 action runs are NOT RUN** (ACT-05 baseline, plus ten throttled/storage-cleared runs). My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01 through ACT-05 rows have observed Network/UI evidence from 16 November 2026. **Ten action runs are NOT RUN** (five throttled-network and five cleared-storage reruns). My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -78,7 +78,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 | ACT-02 — Dashboard | `/web/index.php/dashboard/index` | **GET 200 OK** | Dashboard displayed after returning from PIM | **No errors visible** in captured Console view | Headers + Console screenshots supplied in conversation; repository image files pending | **PASS — baseline dashboard navigation** |
 | ACT-03 — PIM | `/web/index.php/pim/viewPimModule` → `/web/index.php/pim/viewEmployeeList`; employee list XHR also visible | **GET 302 Found → GET 200 OK** | PIM Employee List displayed; **178 Records Found** | **No errors visible** in captured Console view | Three PIM screenshots supplied in conversation; repository image files pending | **PASS — baseline PIM navigation** |
 | ACT-04 — Employee search | `/web/index.php/api/v2/pim/employees?...` (query included `empNumber=114`) | **GET 200 OK**; `Content-Type: application/json` | PIM filtered to **1 Record Found: Joy Smith (employee ID 0321)** | No errors or warnings visible in captured Console | Network list, selected Headers, Response JSON and Console screenshots shared in conversation; repository images pending | **PASS — baseline employee search** |
-| ACT-05 — Logout | — | — | — | Not checked | — | **NOT RUN** |
+| ACT-05 — Logout | `/web/index.php/auth/logout` → `/web/index.php/auth/login` | **GET 302 Found**; destination login page displayed (login-document status not separately captured) | OrangeHRM login page shown after logout | **No errors visible** in Console screenshot; **1 hidden** message indicated by filter | Logout Headers and Console screenshots supplied in conversation, not yet committed as files | **PASS — baseline logout navigation** |
 
 **Baseline findings — ACT-01 (observed 16 November 2026):**
 
@@ -95,7 +95,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Still to record:** exact browser version and screenshots added as repository evidence if submitting the final assessment. **ACT-02 is still pending as a distinct user-initiated dashboard action**; the redirect navigation above belongs to ACT-01.
 - **Evidence protection:** The Payload screenshot visibly includes the login password and a form token. **Do not publish that screenshot as-is.** Redact these values or use only the safe Headers screenshot.
 
-**ACT-05:** NOT RUN for this Day 6 baseline. ACT-01 through ACT-04 have observed positive baseline outcomes.
+**ACT-01 through ACT-05:** PASS for the five observed baseline navigation/search actions. Session invalidation across tabs and further security checks are outside these observations.
 
 ### ACT-02 — Dashboard navigation: verified evidence (16 November 2026)
 
@@ -133,6 +133,18 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Assessment verdict:** **PASS** for the observed employee search. No confirmed defect.
 - **Evidence status:** Four screenshots (Network request list, selected Headers, Console, and JSON Response) were shared during the conversation. **No screenshot file has yet been committed to GitHub.**
 - **Next action:** ACT-05 — Logout and inspect its response and Console.
+
+### ACT-05 — Logout: observed Network and Console evidence (16 November 2026)
+
+- **Action:** Used the OrangeHRM user menu to log out of the public demo.
+- **Network:** Selected `GET https://opensource-demo.orangehrmlive.com/web/index.php/auth/logout`; status **302 Found**.
+- **Redirect:** Response header `Location` pointed to `https://opensource-demo.orangehrmlive.com/web/index.php/auth/login`.
+- **Visible UI:** OrangeHRM login form was displayed after navigation.
+- **Console:** No errors were **visible** in the captured Console pane, although the UI indicated **1 hidden message**; therefore this screenshot cannot establish a completely error-free Console.
+- **Network setup:** **No throttling**, Keep log checked, Disable cache unchecked.
+- **Assessment verdict:** **PASS** for the observed logout-to-login navigation. **This does not independently verify server-side session invalidation or cross-tab logout**.
+- **Evidence:** Two screenshots supplied in the conversation; screenshot files not yet added to GitHub. The login page itself displays publicly provided demo credentials, but do not upload other screenshots exposing private tokens or credentials.
+- **Still optional to inspect:** The redirected `login` document's individual status/Headers and the hidden Console entry if relevant.
 
 ## 6. Run B — Throttled Network
 
@@ -209,11 +221,11 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Fully verified actions | **4/5 (ACT-01–ACT-04)** | 0/5 | 0/5 |
+| Fully verified actions | **5/5 (ACT-01–ACT-05)** | 0/5 | 0/5 |
 | Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | Pending | Pending |
-| Main UI differences | Dashboard/PIM loaded; employee search matched API JSON; logout pending | Pending | Pending |
-| Console errors | **ACT-01–04: none visible in the respective captured Console views** | Not checked | Not checked |
-| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON | Pending | Pending |
+| Main UI differences | Dashboard/PIM loaded, search matched API JSON, logout returned to login page | Pending | Pending |
+| Console errors | **ACT-01–05: none visible in captured views; ACT-05 Console indicated 1 hidden message** | Not checked | Not checked |
+| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | Pending | Pending |
 | Real defects confirmed | **None established yet** | **None established yet** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
@@ -237,7 +249,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Current outcome:** **Four baseline actions PASS** from actual screenshots: login `POST 302 → GET 200`, dashboard `GET 200`, PIM `GET 302 → GET 200`, and employee search `GET 200` JSON with one matching employee. No Console errors were visible in the captured views. **The remaining 11 action runs are NOT RUN** (logout and ten reruns); images still need selection and upload to repository.
+**Current outcome:** **All five baseline actions PASS for the behaviours observed**: login `POST 302 → GET 200`, dashboard `GET 200`, PIM `GET 302 → GET 200`, employee search `GET 200` JSON with one matching employee, and logout `GET 302` returning to the login screen. Console screenshots showed no visible errors; the logout Console indicated **1 hidden message**. **Ten action runs remain NOT RUN** (five throttled, five cleared-storage). Evidence screenshots still need selected, sanitized uploads to GitHub.
 
 ## References
 
