@@ -1,15 +1,143 @@
-# Day 7 — Advanced: API Test Execution, Reporting and Defect Analysis
+# Day 7 — Advanced: Official Topics and Practical API Test Analysis
 
 **Programme:** RoBenDevs QA Engineer Internship — 14-Day Foundation Programme  
 **Topic:** API Testing using Postman, Swagger Petstore v2 and Newman  
-**Level:** Advanced / Practical  
+**Level:** Day 7 Advanced + practical execution evidence  
 **Date:** 16 November 2026  
 **API under test:** `https://petstore.swagger.io/v2`  
-**Repository location:** `day-07-api-testing/`
+**Repository location:** `day-07-api-testing/`  
+**Official Day 7 Advanced source:** Foundation Programme, page 12
 
 > **Evidence integrity:** The figures below are the reported Day 7 execution summary, not a fresh execution performed while writing this document. Inspect the saved Newman JSON/HTML before claiming an individual assertion failed or passed. Swagger Petstore is a shared demonstration service, not a production security target.
 
-## 1. Objective
+
+## Part A — Official Day 7 Advanced Curriculum (Page 12)
+
+The official RoBenDevs Day 7 advanced syllabus contains **three topics**: (1) error contracts, (2) pagination/filtering/sorting, and (3) API vs UI consistency. This is the primary Day 7 advanced learning scope. The additional hands-on execution and Newman material in Part B documents work actually completed during Day 7; more sophisticated automation concepts formally belong to **Day 8**.
+
+### A1. Error Contracts — Consistent and Safe Error Responses
+
+An **error contract** specifies how an API communicates failures: the expected HTTP status, response structure, message and absence of internal system details. An API returning an error is not enough: the error must be predictable, meaningful and safe.
+
+**My verification checklist:**
+- **HTTP status:** Compare actual statuses (e.g., 400 malformed input, 401 unauthenticated, 403 forbidden, 404 absent resource) with the particular endpoint's documented contract. Never assume every API follows identical conventions.
+- **Response shape:** Verify expected keys and types such as `code`, `type`, and `message` when defined.
+- **Message quality:** The error should help the client understand the failure without misleading it.
+- **Information disclosure:** Check that responses do not expose stack traces, SQL statements, absolute server paths, secrets or personal data.
+- **Consistency:** Similar errors should follow the same documented format and content-type.
+
+**Petstore practice:** NEG-05 requested a nonexistent numeric pet ID and previously returned HTTP **404** with passing checks. NEG-04 requested a malformed ID (`abc123`) and previously returned **404** instead of the **400** expected by the test. The latter is an *investigation candidate*, not a confirmed product defect.
+
+```http
+GET https://petstore.swagger.io/v2/pet/abc123
+```
+
+**Illustrative response structure** (not a claim about the exact NEG-04 response):
+
+```json
+{
+  "code": 1,
+  "type": "error",
+  "message": "Pet not found"
+}
+```
+
+**Postman error-contract checks** (use with a case whose documented expected status is 404):
+
+```javascript
+pm.test("Returns the expected 404 error", () => {
+  pm.response.to.have.status(404);
+});
+
+pm.test("Error response has a readable message", () => {
+  const body = pm.response.json();
+  pm.expect(body).to.be.an("object");
+  pm.expect(body.message).to.be.a("string").and.not.empty;
+});
+
+pm.test("No obvious internal error details are exposed", () => {
+  const bodyText = pm.response.text();
+  pm.expect(bodyText).not.to.match(/Traceback|SQL syntax|BEGIN PRIVATE KEY|at [A-Za-z]+\.[A-Za-z]+\(/i);
+});
+```
+
+The last assertion is a *limited heuristic*; it cannot prove information-disclosure safety by itself. Inspect the full response and supporting contract. Do not change a failed expected-status assertion just to achieve a green run.
+
+### A2. Pagination, Filtering and Sorting — Boundaries and Empty Results
+
+**Pagination** splits a large set into smaller pages. **Filtering** selects records matching conditions. **Sorting** orders records according to a specified field. A tester needs to check status *and* the correctness and completeness of the returned data.
+
+| Area | Example test | Validation |
+| --- | --- | --- |
+| Pagination | First page and last page | Right items, no unintended omissions |
+| Pagination | `limit=1`, beyond-last page, invalid page size | Documented boundary behavior |
+| Filtering | Available pets | Every returned pet has `status="available"` |
+| Filtering | Unsupported or missing status | Behavior follows documented rules |
+| Filtering | Filter matching zero records | Valid empty results handled correctly |
+| Sorting | Ascending vs descending | Correct order of values |
+| Sorting | Duplicate values and empty results | Consistent tie-handling and ordering |
+
+**Actual Day 7 Petstore filtering requests:**
+
+```http
+GET https://petstore.swagger.io/v2/pet/findByStatus?status=available
+GET https://petstore.swagger.io/v2/pet/findByStatus?status=pending
+```
+
+POS-01 and POS-02 were exercised during Day 7. An additional content-validation test for POS-01 would be:
+
+```javascript
+pm.test("All results are available pets", () => {
+  pm.response.to.have.status(200);
+  const pets = pm.response.json();
+  pm.expect(pets).to.be.an("array");
+  pets.forEach(pet => pm.expect(pet.status).to.eql("available"));
+});
+```
+
+NEG-07 exercised an invalid `status` filter and received HTTP **200** where the test expected **400**. Check the API documentation and returned body before deciding whether this is wrong.
+
+**Pagination and sorting illustrations only** — these are **not confirmed Swagger Petstore v2 endpoints**:
+
+```http
+GET /products?page=1&limit=10
+GET /products?sort=price&order=asc
+```
+
+For an API that actually exposes these parameters, test minimum/maximum page size, first/last page, beyond-last-page, invalid parameters, ascending/descending order, and empty results. **Do not claim these examples were executed in the Petstore collection.**
+
+### A3. API vs UI Consistency — Comparing Network Data with Displayed Data
+
+An API may return raw values that the frontend formats into labels, dates or currency amounts. **Consistency** means the UI represents those API values accurately according to the application's requirements.
+
+**Practical DevTools workflow:**
+1. Open a web application with an actual frontend that consumes an API.
+2. Open **Chrome DevTools → Network → Fetch/XHR**.
+3. Perform an action (open a user profile, change a filter, place an order).
+4. Inspect the request URL, method, status and JSON response.
+5. Compare the displayed UI with the returned record IDs, names, quantities, prices and status.
+6. Consider intended transformations such as currency formatting, timezone conversion and translated labels.
+7. Investigate mismatches caused by stale state, caching, wrong mappings or missed refreshes.
+8. Save sanitized request/response evidence and a UI screenshot.
+
+**Illustrative comparison:**
+
+| Field | Example API value | Example UI result | Interpretation |
+| --- | --- | --- | --- |
+| Name | `"QA Tester"` | QA Tester | Consistent |
+| Account status | `true` | Active | Consistent if specified by UI requirements |
+| Quantity | `3` | 2 | Potential mismatch |
+| Price | `1200` | ৳1,200 | May be correct formatting; check currency/unit rules |
+
+This table is an *example*, not an observed defect. The Swagger Petstore API console is mainly for invoking endpoints; it does **not** provide a complete consumer application UI for validating these user-facing fields. The Day 6 OrangeHRM browser/DevTools work is a useful basis for doing this properly against an application frontend.
+
+**What I learned:** To verify API vs UI consistency, compare both layers for the same action and the same underlying record. A `200` response alone cannot guarantee that the UI is correct.
+
+---
+
+## Part B — Additional Day 7 Practical Work and Execution Evidence
+
+### Practical 1. Objective
 
 My goal was to move beyond sending individual requests and learn to run a repeatable API test suite with evidence. The Day 7 assignment required at least **25 Postman requests** across positive, negative and authentication scenarios, plus **three cURL executions** and submission of the collection, commands and findings.
 
@@ -21,7 +149,7 @@ I practiced:
 - Running a collection through the command line and interpreting assertion failures;
 - Keeping human-readable reports separate from structured machine-readable evidence.
 
-## 2. System Under Test and Collection
+### Practical 2. System Under Test and Collection
 
 - **Sample API:** Swagger Petstore v2
 - **Base URL:** `https://petstore.swagger.io/v2`
@@ -46,7 +174,7 @@ Newman accepts the standard Postman v2.1 collection JSON. Local View stored this
 
 A syntactically valid JSON collection is **not sufficient**: the converted URLs, request order, body contents and scripts must also be checked against the YAML source.
 
-## 3. Test Design and Request Inventory
+### Practical 3. Test Design and Request Inventory
 
 | Group | Test IDs | Coverage |
 | --- | --- | --- |
@@ -72,7 +200,7 @@ In the original collection, POS-13 was positioned before POS-14. If POS-13 asser
 - An unavailable resource can produce cascading failures. Record the root cause and downstream impact separately.
 - Avoid running performance/load tests against the shared public demo without permission.
 
-## 4. Execution Summary
+### Practical 4. Execution Summary
 
 ### Postman Collection Runner (observed earlier)
 
@@ -95,7 +223,7 @@ Codex reported a separate single-iteration Newman run with **46 passing and 6 fa
 
 **Interpretation:** 46/52 is an **assertion pass rate** of approximately 88.46%. It does **not** establish that 24 or 25 requests passed, or that all 25 ran successfully. Consult `reports/day07-newman-results.json` and `reports/execution-summary.json` for request-level outcomes.
 
-## 5. Findings and Investigations
+### Practical 5. Findings and Investigations
 
 The following six discrepancies were observed during individual Day 7 practice and are candidates for follow-up. Confirm each against the run's structured evidence before making it a formal bug.
 
@@ -123,7 +251,7 @@ Codex found that the converted/saved **POS-15 — Delete Test User** request had
 
 A missing request URL is a **test-suite configuration defect**, not proof of a Petstore API bug.
 
-## 6. Reading the Reports
+### Practical 6. Reading the Reports
 
 The Day 7 local workspace contains a `reports/` directory. From the VS Code screenshot, the generated artifacts include:
 
@@ -141,7 +269,7 @@ The Day 7 local workspace contains a `reports/` directory. From the VS Code scre
 
 Files observed locally are **not automatically available on GitHub**. They must be reviewed for sensitive content, added, committed and pushed from the local repository. A report is only evidence for the run it actually records.
 
-## 7. Reproduce the Newman Execution on Windows
+### Practical 7. Reproduce the Newman Execution on Windows
 
 Codex installed a portable Node.js and Newman in:
 
@@ -171,7 +299,7 @@ newman.cmd run ".\postman-collection\Robendevs-Day07-Swagger-Petstore.postman_co
 
 **Do not rerun just to claim the original results:** a new execution can differ from the previous run. To make a PDF manually, open the HTML report and use the browser's **Print → Save as PDF**.
 
-## 8. Defect Reporting Template
+### Practical 8. Defect Reporting Template
 
 When a discrepancy is reproducible, prepare a Jira report with:
 
@@ -187,7 +315,7 @@ When a discrepancy is reproducible, prepare a Jira report with:
 
 Never include real cookies, bearer tokens, user credentials or API keys in public attachments.
 
-## 9. Learning Outcomes
+### Practical 9. Learning Outcomes
 
 This work reinforced the distinction between:
 
@@ -198,7 +326,7 @@ This work reinforced the distinction between:
 - **A past run and a retest:** reports represent different executions and must be labeled accurately.
 - **Postman and Newman:** Postman helps author/debug requests, while Newman runs v2.1 JSON collections from the CLI.
 
-## 10. Completion Checklist
+### Practical 10. Completion Checklist
 
 - [x] Save 25 test request definitions in three categories.
 - [x] Practice positive, negative and authentication scenarios.
