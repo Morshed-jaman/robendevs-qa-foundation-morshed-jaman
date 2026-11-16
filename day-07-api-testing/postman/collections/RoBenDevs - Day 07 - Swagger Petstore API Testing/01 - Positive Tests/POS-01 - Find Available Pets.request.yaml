@@ -1,0 +1,42 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet/findByStatus?status=available
+method: GET
+queryParams:
+  status: available
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Status code is 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response is a JSON array\", function () {\r
+
+      \    const pets = pm.response.json();\r
+
+      \    pm.expect(pets).to.be.an(\"array\");\r
+
+      });\r
+
+      \r
+
+      pm.test(\"All returned pets are available\", function () {\r
+
+      \    const pets = pm.response.json();\r
+
+      \r
+
+      \    pets.forEach(function (pet) {\r
+
+      \        pm.expect(pet.status).to.eql(\"available\");\r
+
+      \    });\r
+
+      });\r\n"
+    language: text/javascript
+order: 1000

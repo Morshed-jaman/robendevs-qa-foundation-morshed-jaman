@@ -1,0 +1,22 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet/202611160803
+method: GET
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Deleted pet returns 404\", function () {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Deleted pet is not accessible\", function () {\r
+
+      \    pm.expect(pm.response.code).to.eql(404);\r
+
+      });\r\n"
+    language: text/javascript
+order: 1000

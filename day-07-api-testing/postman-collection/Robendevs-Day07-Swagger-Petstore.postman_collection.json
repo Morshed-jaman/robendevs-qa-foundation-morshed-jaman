@@ -1,0 +1,920 @@
+{
+  "info": {
+    "name": "RoBenDevs - Day 07 - Swagger Petstore API Testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Positive Tests",
+      "item": [
+        {
+          "name": "POS-01 - Find Available Pets",
+          "request": {
+            "method": "GET",
+            "url": {
+              "protocol": "https",
+              "path": [
+                "v2",
+                "pet",
+                "findByStatus"
+              ],
+              "host": [
+                "petstore",
+                "swagger",
+                "io"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "available"
+                }
+              ],
+              "variable": []
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is a JSON array\", function () {\r",
+                  "    const pets = pm.response.json();\r",
+                  "    pm.expect(pets).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All returned pets are available\", function () {\r",
+                  "    const pets = pm.response.json();\r",
+                  "\r",
+                  "    pets.forEach(function (pet) {\r",
+                  "        pm.expect(pet.status).to.eql(\"available\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-02 - Find Pending Pets",
+          "request": {
+            "method": "GET",
+            "url": {
+              "protocol": "https",
+              "path": [
+                "v2",
+                "pet",
+                "findByStatus"
+              ],
+              "host": [
+                "petstore",
+                "swagger",
+                "io"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ],
+              "variable": []
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is a JSON array\", function () {\r",
+                  "    pm.expect(pm.response.json()).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All returned pets are pending\", function () {\r",
+                  "    const pets = pm.response.json();\r",
+                  "\r",
+                  "    pets.forEach(function (pet) {\r",
+                  "        pm.expect(pet.status).to.eql(\"pending\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-03 - Create New Pet",
+          "request": {
+            "method": "POST",
+            "url": "https://petstore.swagger.io/v2/pet",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"id\": 202611160803,\r\n  \"name\": \"RoBenDevs QA Test Pet\",\r\n  \"category\": {\r\n    \"id\": 1,\r\n    \"name\": \"Dogs\"\r\n  },\r\n  \"photoUrls\": [\r\n    \"https://example.com/test-pet.jpg\"\r\n  ],\r\n  \"tags\": [\r\n    {\r\n      \"id\": 1,\r\n      \"name\": \"qa-test\"\r\n    }\r\n  ],\r\n  \"status\": \"available\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Pet creation succeeds\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created pet has correct details\", function () {\r",
+                  "    const pet = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(pet.id).to.eql(202611160803);\r",
+                  "    pm.expect(pet.name).to.eql(\"RoBenDevs QA Test Pet\");\r",
+                  "    pm.expect(pet.status).to.eql(\"available\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-04 - Get Pet by ID",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/pet/202611160803",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retrieved pet matches created pet\", function () {\r",
+                  "    const pet = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(pet.id).to.eql(202611160803);\r",
+                  "    pm.expect(pet.name).to.eql(\"RoBenDevs QA Test Pet\");\r",
+                  "    pm.expect(pet.status).to.eql(\"available\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-05 - Update Pet Details",
+          "request": {
+            "method": "PUT",
+            "url": "https://petstore.swagger.io/v2/pet",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"id\": 202611160803,\r\n  \"category\": {\r\n    \"id\": 1,\r\n    \"name\": \"Dogs\"\r\n  },\r\n  \"name\": \"RoBenDevs QA Updated Pet\",\r\n  \"photoUrls\": [\r\n    \"https://example.com/test-pet.jpg\"\r\n  ],\r\n  \"tags\": [\r\n    {\r\n      \"id\": 1,\r\n      \"name\": \"qa-updated\"\r\n    }\r\n  ],\r\n  \"status\": \"sold\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Pet update succeeds\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated pet ID matches\", function () {\r",
+                  "    const pet = pm.response.json();\r",
+                  "    pm.expect(pet.id).to.eql(202611160803);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated details are correct\", function () {\r",
+                  "    const pet = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(pet.name).to.eql(\"RoBenDevs QA Updated Pet\");\r",
+                  "    pm.expect(pet.status).to.eql(\"sold\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-06 - Verify Updated Pet",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/pet/202611160803",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated pet name is saved\", function () {\r",
+                  "    const pet = pm.response.json();\r",
+                  "    pm.expect(pet.name).to.eql(\"RoBenDevs QA Updated Pet\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated status is sold\", function () {\r",
+                  "    const pet = pm.response.json();\r",
+                  "    pm.expect(pet.status).to.eql(\"sold\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-07 - Delete Test Pet",
+          "request": {
+            "method": "DELETE",
+            "url": "https://petstore.swagger.io/v2/pet/202611160803",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "special-key"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Delete request succeeds\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response has a successful status\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.within(200, 299);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-08 - Get Store Inventory",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/store/inventory",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "special-key"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Inventory request succeeds\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is valid JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Inventory contains numeric quantities\", function () {\r",
+                  "    const inventory = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(inventory).to.be.an(\"object\");\r",
+                  "\r",
+                  "    Object.values(inventory).forEach(function (quantity) {\r",
+                  "        pm.expect(quantity).to.be.a(\"number\");\r",
+                  "    });\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-09 - Place Store Order",
+          "request": {
+            "method": "POST",
+            "url": "https://petstore.swagger.io/v2/store/order",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"id\": 2026111609,\r\n  \"petId\": 202611160803,\r\n  \"quantity\": 1,\r\n  \"shipDate\": \"2026-11-16T08:50:00.000Z\",\r\n  \"status\": \"placed\",\r\n  \"complete\": false\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Order creation succeeds\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created order details are correct\", function () {\r",
+                  "    const order = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(order.id).to.eql(2026111609);\r",
+                  "    pm.expect(order.quantity).to.eql(1);\r",
+                  "    pm.expect(order.status).to.eql(\"placed\");\r",
+                  "    pm.expect(order.complete).to.eql(false);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-10 - Get Store Order by ID",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/store/order/2026111609",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Order retrieval succeeds\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is valid JSON\", function () {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Retrieved order matches created order\", function () {\r",
+                  "    const order = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(order.id).to.eql(2026111609);\r",
+                  "    pm.expect(order.quantity).to.eql(1);\r",
+                  "    pm.expect(order.status).to.eql(\"placed\");\r",
+                  "    pm.expect(order.complete).to.eql(false);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-11 — Delete Store Order",
+          "request": {
+            "method": "DELETE",
+            "url": "https://petstore.swagger.io/v2/store/order/2026111609",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Delete order succeeds\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-12 — Create User",
+          "request": {
+            "method": "POST",
+            "url": "https://petstore.swagger.io/v2/user",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"id\": 202611160814,\r\n  \"username\": \"robendevs_qa_20261116_814\",\r\n  \"firstName\": \"QA\",\r\n  \"lastName\": \"Tester\",\r\n  \"email\": \"qa-test@example.com\",\r\n  \"password\": \"DemoTestOnly123!\",\r\n  \"phone\": \"0000000000\",\r\n  \"userStatus\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"User creation succeeds\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", () => {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-13 — Retrieve Created User",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/user/robendevs_qa_20261116_814",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"User retrieval succeeds\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created user details match\", () => {\r",
+                  "    const user = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(user.username)\r",
+                  "      .to.eql(\"robendevs_qa_20261116_814\");\r",
+                  "\r",
+                  "    pm.expect(user.firstName).to.eql(\"QA\");\r",
+                  "    pm.expect(user.lastName).to.eql(\"Tester\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-14 — Update User",
+          "request": {
+            "method": "PUT",
+            "url": "https://petstore.swagger.io/v2/user/robendevs_qa_20261116_814",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"id\": 202611160814,\r\n  \"username\": \"robendevs_qa_20261116_814\",\r\n  \"firstName\": \"Updated QA\",\r\n  \"lastName\": \"Tester\",\r\n  \"email\": \"qa-updated@example.com\",\r\n  \"password\": \"DemoTestOnly123!\",\r\n  \"phone\": \"0000000000\",\r\n  \"userStatus\": 1\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"User update request succeeds\", () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is JSON\", () => {\r",
+                  "    pm.response.to.be.json;\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POS-15 — Delete Test User",
+          "request": {
+            "method": "GET",
+            "url": "",
+            "header": []
+          },
+          "event": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Negative Tests",
+      "item": [
+        {
+          "name": "NEG-01 - Verify Deleted Pet Returns 404",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/pet/202611160803",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Deleted pet returns 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Deleted pet is not accessible\", function () {\r",
+                  "    pm.expect(pm.response.code).to.eql(404);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NEG-02 — Verify Deleted Order",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/store/order/2026111609",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "",
+                  "pm.test(\"Deleted order returns 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test(\"Deletion verification completed\", function () {",
+                  "    pm.expect(pm.response.code).to.eql(404);",
+                  "});",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NEG-03 — Verify Deleted User",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/user/robendevs_qa_20261116_81",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Deleted user returns 404\", () => {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NEG-04 — Invalid Pet ID",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/pet/abc123",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Invalid pet ID is rejected\", () => {\r",
+                  "    pm.expect(pm.response.code).to.eql(400);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NEG-05 — Nonexistent Pet ID",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/pet/999999999999999",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Nonexistent pet returns 404\", function () {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response indicates missing pet\", function () {\r",
+                  "    const data = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(data.message).to.be.a(\"string\");\r",
+                  "    pm.expect(data.message.toLowerCase())\r",
+                  "      .to.include(\"not found\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NEG-06 — Create Pet Without Required Name",
+          "request": {
+            "method": "POST",
+            "url": "https://petstore.swagger.io/v2/pet",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "\r\n{\r\n  \"id\": 202611160899,\r\n  \"photoUrls\": [\r\n    \"https://example.com/test.jpg\"\r\n  ],\r\n  \"status\": \"available\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Missing required name is rejected\", () => {\r",
+                  "    pm.expect(pm.response.code).to.be.within(400, 499);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "NEG-07 - Invalid Pet Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "protocol": "https",
+              "path": [
+                "v2",
+                "pet",
+                "findByStatus"
+              ],
+              "host": [
+                "petstore",
+                "swagger",
+                "io"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "unknown"
+                }
+              ],
+              "variable": []
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Invalid pet status is rejected\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Authentication Tests",
+      "item": [
+        {
+          "name": "AUTH-01 - Inventory Without API Key",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/store/inventory",
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Missing API key should be rejected\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([401, 403]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Record actual response status\", function () {\r",
+                  "    console.log(\"HTTP status:\", pm.response.code);\r",
+                  "    pm.expect(pm.response.code).to.be.a(\"number\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AUTH-02 - Inventory With Invalid API Key",
+          "request": {
+            "method": "GET",
+            "url": "https://petstore.swagger.io/v2/store/inventory",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "invalid-test-key"
+              }
+            ]
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Invalid API key should be rejected\", function () {\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([401, 403]);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Actual response status is recorded\", function () {\r",
+                  "    console.log(\"HTTP status:\", pm.response.code);\r",
+                  "    pm.expect(pm.response.code).to.be.a(\"number\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AUTH-03 - Login With Invalid Credentials",
+          "request": {
+            "method": "GET",
+            "url": {
+              "protocol": "https",
+              "path": [
+                "v2",
+                "user",
+                "login"
+              ],
+              "host": [
+                "petstore",
+                "swagger",
+                "io"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "robendevs_invalid_user",
+                  "disabled": false,
+                  "description": ""
+                },
+                {
+                  "key": "password",
+                  "value": "wrong-password-123",
+                  "disabled": false,
+                  "description": ""
+                }
+              ],
+              "variable": []
+            },
+            "header": []
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "\r",
+                  "pm.test(\"Invalid credentials are rejected\", function () {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Record actual login response\", function () {\r",
+                  "    console.log(\"Actual status:\", pm.response.code);\r",
+                  "    console.log(\"Response:\", pm.response.text());\r",
+                  "\r",
+                  "    pm.expect(pm.response.code).to.be.a(\"number\");\r",
+                  "});\r",
+                  ""
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

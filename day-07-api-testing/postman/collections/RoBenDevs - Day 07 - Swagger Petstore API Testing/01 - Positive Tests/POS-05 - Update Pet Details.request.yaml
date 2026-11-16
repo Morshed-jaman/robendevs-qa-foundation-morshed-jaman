@@ -1,0 +1,77 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet
+method: PUT
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": 202611160803,\r
+
+    \  \"category\": {\r
+
+    \    \"id\": 1,\r
+
+    \    \"name\": \"Dogs\"\r
+
+    \  },\r
+
+    \  \"name\": \"RoBenDevs QA Updated Pet\",\r
+
+    \  \"photoUrls\": [\r
+
+    \    \"https://example.com/test-pet.jpg\"\r
+
+    \  ],\r
+
+    \  \"tags\": [\r
+
+    \    {\r
+
+    \      \"id\": 1,\r
+
+    \      \"name\": \"qa-updated\"\r
+
+    \    }\r
+
+    \  ],\r
+
+    \  \"status\": \"sold\"\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Pet update succeeds\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Updated pet ID matches\", function () {\r
+
+      \    const pet = pm.response.json();\r
+
+      \    pm.expect(pet.id).to.eql(202611160803);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Updated details are correct\", function () {\r
+
+      \    const pet = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(pet.name).to.eql(\"RoBenDevs QA Updated Pet\");\r
+
+      \    pm.expect(pet.status).to.eql(\"sold\");\r
+
+      });\r\n"
+    language: text/javascript
+order: 5000

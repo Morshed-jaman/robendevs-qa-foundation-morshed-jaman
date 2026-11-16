@@ -1,0 +1,184 @@
+{
+  "method": "Custom YAML mapping; official v2.1 schema validated and Postman SDK loaded. Not a native export or officially supported v3 reverse migration.",
+  "requestCount": 25,
+  "plannedAssertions": 52,
+  "order": [
+    "POS-03",
+    "POS-04",
+    "POS-05",
+    "POS-06",
+    "POS-07",
+    "NEG-01",
+    "POS-09",
+    "POS-10",
+    "POS-11",
+    "NEG-02",
+    "POS-12",
+    "POS-13",
+    "POS-14",
+    "POS-15",
+    "NEG-03",
+    "POS-01",
+    "POS-02",
+    "POS-08",
+    "NEG-04",
+    "NEG-05",
+    "NEG-06",
+    "NEG-07",
+    "AUTH-01",
+    "AUTH-02",
+    "AUTH-03"
+  ],
+  "records": [
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-01 - Find Available Pets.request.yaml",
+      "sha256": "126ddf5bd90b1435cddba3860477c74cff081b995b5fe88c674b30bcbb5def54",
+      "name": "POS-01 - Find Available Pets",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-02 - Find Pending Pets.request.yaml",
+      "sha256": "e2cc8dfb61d710713b5e3362e5305286d5defc76ff56bce81c07b2f0d5e3b581",
+      "name": "POS-02 - Find Pending Pets",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-03 - Create New Pet.request.yaml",
+      "sha256": "75e0fbfba6a80a3a256a1fba8b5b2aec7822569e6b8f179d7396a6d763e6292e",
+      "name": "POS-03 - Create New Pet",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-04 - Get Pet by ID.request.yaml",
+      "sha256": "36835097c4b4808a4490800d8299c039c9f87a59aae7459de194f85118bc56ea",
+      "name": "POS-04 - Get Pet by ID",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-05 - Update Pet Details.request.yaml",
+      "sha256": "21711946c3a4aba2bfb1fc3058e587b189efd6325e22a36bd4d461282ce3de1f",
+      "name": "POS-05 - Update Pet Details",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-06 - Verify Updated Pet.request.yaml",
+      "sha256": "187f4411e3791fad0e4d5fee5d1ce2e1b19e34b77e6b0c93732cbff84bc91595",
+      "name": "POS-06 - Verify Updated Pet",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-07 - Delete Test Pet.request.yaml",
+      "sha256": "203713aa846888997cbf636427344d7eb7b723e3eabbf1bfa0a832fef87f8093",
+      "name": "POS-07 - Delete Test Pet",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-08 - Get Store Inventory.request.yaml",
+      "sha256": "04c48a3addbba9b456d3eda240dab6929ca766a08587c717b8ccf045b5619870",
+      "name": "POS-08 - Get Store Inventory",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-09 - Place Store Order.request.yaml",
+      "sha256": "b42c5eaecb0451df52409450614176418b5fda5b4ffc49a9abd1fcc9c376b631",
+      "name": "POS-09 - Place Store Order",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-10 - Get Store Order by ID.request.yaml",
+      "sha256": "6e171269b68903fabefeb05be3f302257692d118245814bec7741082700ab7b8",
+      "name": "POS-10 - Get Store Order by ID",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-11 — Delete Store Order.request.yaml",
+      "sha256": "1b0a4243666f22743fe5ad384bc1e3a8b7eea4ee6e4ac9893e073d3b1ff9fa34",
+      "name": "POS-11 — Delete Store Order",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-12 — Create User.request.yaml",
+      "sha256": "9b5099cfa30598a131a3286c7f6679fed4dc14378b920caa280ea4c4fc7bd1c6",
+      "name": "POS-12 — Create User",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-13 — Retrieve Created User.request.yaml",
+      "sha256": "6e2ff0f143a6a32582e9c39fb778ae3fe34617e598fa9e3e3a0d3af27c824138",
+      "name": "POS-13 — Retrieve Created User",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-14 — Update User.request.yaml",
+      "sha256": "107637a8303c73b7e19e08de34098a98789d913065acce64e798c59c449eaedc",
+      "name": "POS-14 — Update User",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\01 - Positive Tests\\POS-15 — Delete Test User.request.yaml",
+      "sha256": "6e950d51e76f7a526ba439aa3d1f7fcec1b21cd3f0a1bc09788b27f0e42f5fc3",
+      "name": "POS-15 — Delete Test User",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-01 - Verify Deleted Pet Returns 404.request.yaml",
+      "sha256": "eb332d941a1d01b85e4e41558c818f66a4ea24e872fd3c67fc29038bf030c5e6",
+      "name": "NEG-01 - Verify Deleted Pet Returns 404",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-02 — Verify Deleted Order.request.yaml",
+      "sha256": "76d5f06e918a1b582450d06cb5df92be111e6de86da01b2369b1145f2cb49daf",
+      "name": "NEG-02 — Verify Deleted Order",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-03 — Verify Deleted User.request.yaml",
+      "sha256": "2afc641de6d42d913f3f709b8d4fa17415dadf8fa4476e4a1b5b9c5ae4133064",
+      "name": "NEG-03 — Verify Deleted User",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-04 — Invalid Pet ID.request.yaml",
+      "sha256": "e0794675eb435a068c543de0bcf26c5d71805e65603b52e44937ef11f4a74ea0",
+      "name": "NEG-04 — Invalid Pet ID",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-05 — Nonexistent Pet ID.request.yaml",
+      "sha256": "d9b0e90f033d1f920b30026630edf1f0e5e5ad7e221b3e8df60afbe27effffe7",
+      "name": "NEG-05 — Nonexistent Pet ID",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-06 — Create Pet Without Required Name.request.yaml",
+      "sha256": "17073e59c0f8e769d569d02c0e02b803faed47ee58e556e13f6d709fe6460329",
+      "name": "NEG-06 — Create Pet Without Required Name",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\02 - Negative Tests\\NEG-07 - Invalid Pet Status.request.yaml",
+      "sha256": "3aea5a427d036a18d10067e7a59cdb9ed75bb18b08a233f19f44a6669faeb268",
+      "name": "NEG-07 - Invalid Pet Status",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\03 - Authentication Tests\\AUTH-01 - Inventory Without API Key.request.yaml",
+      "sha256": "92f6ba7f1f1175fa2d23f33a2e909b58faaecffcdf5eb64b5f9bf7ab49bbe9b0",
+      "name": "AUTH-01 - Inventory Without API Key",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\03 - Authentication Tests\\AUTH-02 - Inventory With Invalid API Key.request.yaml",
+      "sha256": "5fc14a019abd2a16062ce52a473046b5eafebc8b7bf72bae1da88f068bed9833",
+      "name": "AUTH-02 - Inventory With Invalid API Key",
+      "originalId": null
+    },
+    {
+      "file": "postman\\collections\\RoBenDevs - Day 07 - Swagger Petstore API Testing\\03 - Authentication Tests\\AUTH-03 - Login With Invalid Credentials.request.yaml",
+      "sha256": "4c21ca0c6fd743f6f0b005fdb0681e78a1d51d210458cdfa88715b0922f6d26c",
+      "name": "AUTH-03 - Login With Invalid Credentials",
+      "originalId": null
+    }
+  ]
+}

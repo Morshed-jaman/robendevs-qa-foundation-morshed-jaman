@@ -1,0 +1,207 @@
+﻿One Newman iteration; 25 saved requests; original scripts unchanged; planned assertions: 52
+newman
+
+RoBenDevs - Day 07 - Swagger Petstore API Testing
+
+â†’ POS-03 - Create New Pet
+  POST https://petstore.swagger.io/v2/pet [200 OK, 515B, 1050ms]
+  âˆš  Pet creation succeeds
+  âˆš  Response is JSON
+  âˆš  Created pet has correct details
+
+â†’ POS-04 - Get Pet by ID
+  GET https://petstore.swagger.io/v2/pet/202611160803 [200 OK, 515B, 246ms]
+  âˆš  Status code is 200
+  âˆš  Response is JSON
+  âˆš  Retrieved pet matches created pet
+
+â†’ POS-05 - Update Pet Details
+  PUT https://petstore.swagger.io/v2/pet [200 OK, 516B, 243ms]
+  âˆš  Pet update succeeds
+  âˆš  Updated pet ID matches
+  âˆš  Updated details are correct
+
+â†’ POS-06 - Verify Updated Pet
+  GET https://petstore.swagger.io/v2/pet/202611160803 [200 OK, 516B, 247ms]
+  âˆš  Status code is 200
+  âˆš  Updated pet name is saved
+  âˆš  Updated status is sold
+
+â†’ POS-07 - Delete Test Pet
+  DELETE https://petstore.swagger.io/v2/pet/202611160803 [200 OK, 380B, 245ms]
+  âˆš  Delete request succeeds
+  âˆš  Response has a successful status
+
+â†’ NEG-01 - Verify Deleted Pet Returns 404
+  GET https://petstore.swagger.io/v2/pet/202611160803 [404 Not Found, 384B, 251ms]
+  âˆš  Deleted pet returns 404
+  âˆš  Deleted pet is not accessible
+
+â†’ POS-09 - Place Store Order
+  POST https://petstore.swagger.io/v2/store/order [200 OK, 454B, 250ms]
+  âˆš  Order creation succeeds
+  âˆš  Response is JSON
+  âˆš  Created order details are correct
+
+â†’ POS-10 - Get Store Order by ID
+  GET https://petstore.swagger.io/v2/store/order/2026111609 [200 OK, 454B, 246ms]
+  âˆš  Order retrieval succeeds
+  âˆš  Response is valid JSON
+  âˆš  Retrieved order matches created order
+
+â†’ POS-11 â€” Delete Store Order
+  DELETE https://petstore.swagger.io/v2/store/order/2026111609 [200 OK, 378B, 250ms]
+  âˆš  Delete order succeeds
+
+â†’ NEG-02 â€” Verify Deleted Order
+  GET https://petstore.swagger.io/v2/store/order/2026111609 [404 Not Found, 386B, 252ms]
+  âˆš  Deleted order returns 404
+  âˆš  Deletion verification completed
+
+â†’ POS-12 â€” Create User
+  POST https://petstore.swagger.io/v2/user [200 OK, 380B, 247ms]
+  âˆš  User creation succeeds
+  âˆš  Response is JSON
+
+â†’ POS-13 â€” Retrieve Created User
+  GET https://petstore.swagger.io/v2/user/robendevs_qa_20261116_814 [200 OK, 517B, 246ms]
+  âˆš  User retrieval succeeds
+  âˆš  Created user details match
+
+â†’ POS-14 â€” Update User
+  PUT https://petstore.swagger.io/v2/user/robendevs_qa_20261116_814 [200 OK, 380B, 255ms]
+  âˆš  User update request succeeds
+  âˆš  Response is JSON
+
+â†’ POS-15 â€” Delete Test User
+  GET  [errored]
+     runtime:extenstions~request: request url is empty
+
+â†’ NEG-03 â€” Verify Deleted User
+  GET https://petstore.swagger.io/v2/user/robendevs_qa_20261116_81 [404 Not Found, 385B, 341ms]
+  âˆš  Deleted user returns 404
+
+â†’ POS-01 - Find Available Pets
+  GET https://petstore.swagger.io/v2/pet/findByStatus?status=available [200 OK, 14.36KB, 564ms]
+  âˆš  Status code is 200
+  âˆš  Response is a JSON array
+  âˆš  All returned pets are available
+
+â†’ POS-02 - Find Pending Pets
+  GET https://petstore.swagger.io/v2/pet/findByStatus?status=pending [200 OK, 3.88KB, 256ms]
+  âˆš  Status code is 200
+  âˆš  Response is a JSON array
+  âˆš  All returned pets are pending
+
+â†’ POS-08 - Get Store Inventory
+  GET https://petstore.swagger.io/v2/store/inventory [200 OK, 461B, 253ms]
+  âˆš  Inventory request succeeds
+  âˆš  Response is valid JSON
+  âˆš  Inventory contains numeric quantities
+
+â†’ NEG-04 â€” Invalid Pet ID
+  GET https://petstore.swagger.io/v2/pet/abc123 [404 Not Found, 436B, 352ms]
+  2. Invalid pet ID is rejected
+
+â†’ NEG-05 â€” Nonexistent Pet ID
+  GET https://petstore.swagger.io/v2/pet/999999999999999 [404 Not Found, 384B, 329ms]
+  âˆš  Nonexistent pet returns 404
+  âˆš  Response indicates missing pet
+
+â†’ NEG-06 â€” Create Pet Without Required Name
+  POST https://petstore.swagger.io/v2/pet [200 OK, 421B, 442ms]
+  3. Missing required name is rejected
+
+â†’ NEG-07 - Invalid Pet Status
+  GET https://petstore.swagger.io/v2/pet/findByStatus?status=unknown [200 OK, 328B, 320ms]
+  4. Invalid pet status is rejected
+
+â†’ AUTH-01 - Inventory Without API Key
+  GET https://petstore.swagger.io/v2/store/inventory [200 OK, 461B, 259ms]
+  5. Missing API key should be rejected
+  â”Œ
+  â”‚ 'HTTP status:', 200
+  â””
+  âˆš  Record actual response status
+
+â†’ AUTH-02 - Inventory With Invalid API Key
+  GET https://petstore.swagger.io/v2/store/inventory [200 OK, 461B, 252ms]
+  6. Invalid API key should be rejected
+  â”Œ
+  â”‚ 'HTTP status:', 200
+  â””
+  âˆš  Actual response status is recorded
+
+â†’ AUTH-03 - Login With Invalid Credentials
+  GET https://petstore.swagger.io/v2/user/login?username=robendevs_invalid_user&password=wrong-password-123 [200 OK, 471B, 253ms]
+  7. Invalid credentials are rejected
+  â”Œ
+  â”‚ 'Actual status:', 200
+  â”‚ 'Response:', '{"code":200,"type":"unknown","message":"
+  â”‚ logged in user session:[REDACTED]"}'
+  â””
+  âˆš  Record actual login response
+
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚                         â”‚            executed â”‚              failed â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚              iterations â”‚                   1 â”‚                   0 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚                requests â”‚                  25 â”‚                   1 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚            test-scripts â”‚                  24 â”‚                   0 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚      prerequest-scripts â”‚                   0 â”‚                   0 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚              assertions â”‚                  52 â”‚                   6 â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ total run duration: 9.6s                                            â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ total data received: 19.85KB (approx)                               â”‚
+â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+â”‚ average response time: 318ms [min: 243ms, max: 1050ms, s.d.: 171ms] â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+
+  #  failure         detail                                                
+                                                                           
+ 1.  Error                                                                 
+                     runtime:extenstions~request: request url is empty     
+                     at request                                            
+                     inside "POS-15 â€” Delete Test User"                    
+                                                                           
+ 2.  AssertionError  Invalid pet ID is rejected                            
+                     expected 404 to deeply equal 400                      
+                     at assertion:0 in test-script                         
+                     inside "NEG-04 â€” Invalid Pet ID"                      
+                                                                           
+ 3.  AssertionError  Missing required name is rejected                     
+                     expected 200 to be within 400..499                    
+                     at assertion:0 in test-script                         
+                     inside "NEG-06 â€” Create Pet Without Required Name"    
+                                                                           
+ 4.  AssertionError  Invalid pet status is rejected                        
+                     expected response to have status code 400 but got 200 
+                     at assertion:0 in test-script                         
+                     inside "NEG-07 - Invalid Pet Status"                  
+                                                                           
+ 5.  AssertionError  Missing API key should be rejected                    
+                     expected 200 to be one of [ 401, 403 ]                
+                     at assertion:0 in test-script                         
+                     inside "AUTH-01 - Inventory Without API Key"          
+                                                                           
+ 6.  AssertionError  Invalid API key should be rejected                    
+                     expected 200 to be one of [ 401, 403 ]                
+                     at assertion:0 in test-script                         
+                     inside "AUTH-02 - Inventory With Invalid API Key"     
+                                                                           
+ 7.  AssertionError  Invalid credentials are rejected                      
+                     expected response to have status code 400 but got 200 
+                     at assertion:0 in test-script                         
+                     inside "AUTH-03 - Login With Invalid Credentials"     
+One Newman iteration; 25 saved requests; original scripts unchanged; planned assertions: 52
+VERIFIED {"requests":{"total":25,"pending":0,"failed":1},"assertions":{"total":52,"pending":0,"failed":6},"statuses":{"200":19,"404":5},"pdfPages":3,"htmlErrors":[]}
+
+Report verification from saved evidence; 52
+VERIFIED {"requests":{"total":25,"pending":0,"failed":1},"assertions":{"total":52,"pending":0,"failed":6},"statuses":{"200":19,"404":5},"pdfPages":3,"htmlErrors":[]}
+Report verification from saved evidence; 52
+VERIFIED {"requests":{"total":25,"pending":0,"failed":1},"assertions":{"total":52,"pending":0,"failed":6},"statuses":{"200":19,"404":5},"pdfPages":3,"htmlErrors":[]}

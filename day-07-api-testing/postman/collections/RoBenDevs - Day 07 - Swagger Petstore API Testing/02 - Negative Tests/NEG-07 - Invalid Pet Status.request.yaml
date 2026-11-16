@@ -1,0 +1,16 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet/findByStatus?status=unknown
+method: GET
+queryParams:
+  status: unknown
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Invalid pet status is rejected\", function () {\r
+
+      \    pm.response.to.have.status(400);\r
+
+      });\r\n"
+    language: text/javascript
+order: 7000

@@ -1,0 +1,45 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/user/robendevs_qa_20261116_814
+method: PUT
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": 202611160814,\r
+
+    \  \"username\": \"robendevs_qa_20261116_814\",\r
+
+    \  \"firstName\": \"Updated QA\",\r
+
+    \  \"lastName\": \"Tester\",\r
+
+    \  \"email\": \"qa-updated@example.com\",\r
+
+    \  \"password\": \"DemoTestOnly123!\",\r
+
+    \  \"phone\": \"0000000000\",\r
+
+    \  \"userStatus\": 1\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"User update request succeeds\", () => {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response is JSON\", () => {\r
+
+      \    pm.response.to.be.json;\r
+
+      });\r\n"
+    language: text/javascript
+order: 13000

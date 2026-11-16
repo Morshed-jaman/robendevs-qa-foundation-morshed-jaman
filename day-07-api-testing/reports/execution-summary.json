@@ -1,0 +1,363 @@
+{
+  "dateDhaka": "2026-11-16",
+  "timings": {
+    "responseAverage": 318.3538461538461,
+    "responseMin": 243,
+    "responseMax": 1050,
+    "responseSd": 171.81765206791232,
+    "dnsAverage": 0,
+    "dnsMin": 0,
+    "dnsMax": 0,
+    "dnsSd": 0,
+    "firstByteAverage": 0,
+    "firstByteMin": 0,
+    "firstByteMax": 0,
+    "firstByteSd": 0,
+    "started": 1794823802390,
+    "completed": 1794823812006
+  },
+  "stats": {
+    "iterations": {
+      "total": 1,
+      "pending": 0,
+      "failed": 0
+    },
+    "items": {
+      "total": 25,
+      "pending": 0,
+      "failed": 0
+    },
+    "scripts": {
+      "total": 24,
+      "pending": 0,
+      "failed": 0
+    },
+    "prerequests": {
+      "total": 25,
+      "pending": 0,
+      "failed": 0
+    },
+    "requests": {
+      "total": 25,
+      "pending": 0,
+      "failed": 1
+    },
+    "tests": {
+      "total": 25,
+      "pending": 0,
+      "failed": 0
+    },
+    "assertions": {
+      "total": 52,
+      "pending": 0,
+      "failed": 6
+    },
+    "testScripts": {
+      "total": 24,
+      "pending": 0,
+      "failed": 0
+    },
+    "prerequestScripts": {
+      "total": 0,
+      "pending": 0,
+      "failed": 0
+    }
+  },
+  "statuses": {
+    "200": 19,
+    "404": 5
+  },
+  "groups": [
+    {
+      "category": "POS",
+      "requests": 15,
+      "assertions": 36,
+      "passed": 36,
+      "failed": 0
+    },
+    {
+      "category": "NEG",
+      "requests": 7,
+      "assertions": 10,
+      "passed": 7,
+      "failed": 3
+    },
+    {
+      "category": "AUTH",
+      "requests": 3,
+      "assertions": 6,
+      "passed": 3,
+      "failed": 3
+    }
+  ],
+  "rows": [
+    {
+      "name": "POS-03 - Create New Pet",
+      "method": "POST",
+      "status": 200,
+      "ms": 1050,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-04 - Get Pet by ID",
+      "method": "GET",
+      "status": 200,
+      "ms": 246,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-05 - Update Pet Details",
+      "method": "PUT",
+      "status": 200,
+      "ms": 243,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-06 - Verify Updated Pet",
+      "method": "GET",
+      "status": 200,
+      "ms": 247,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-07 - Delete Test Pet",
+      "method": "DELETE",
+      "status": 200,
+      "ms": 245,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "NEG-01 - Verify Deleted Pet Returns 404",
+      "method": "GET",
+      "status": 404,
+      "ms": 251,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-09 - Place Store Order",
+      "method": "POST",
+      "status": 200,
+      "ms": 250,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-10 - Get Store Order by ID",
+      "method": "GET",
+      "status": 200,
+      "ms": 246,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-11 — Delete Store Order",
+      "method": "DELETE",
+      "status": 200,
+      "ms": 250,
+      "assertions": 1,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "NEG-02 — Verify Deleted Order",
+      "method": "GET",
+      "status": 404,
+      "ms": 252,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-12 — Create User",
+      "method": "POST",
+      "status": 200,
+      "ms": 247,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-13 — Retrieve Created User",
+      "method": "GET",
+      "status": 200,
+      "ms": 246,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-14 — Update User",
+      "method": "PUT",
+      "status": 200,
+      "ms": 255,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-15 — Delete Test User",
+      "method": "GET",
+      "status": "NO RESPONSE",
+      "ms": null,
+      "assertions": 0,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "NEG-03 — Verify Deleted User",
+      "method": "GET",
+      "status": 404,
+      "ms": 341,
+      "assertions": 1,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-01 - Find Available Pets",
+      "method": "GET",
+      "status": 200,
+      "ms": 564,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-02 - Find Pending Pets",
+      "method": "GET",
+      "status": 200,
+      "ms": 256,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "POS-08 - Get Store Inventory",
+      "method": "GET",
+      "status": 200,
+      "ms": 253,
+      "assertions": 3,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "NEG-04 — Invalid Pet ID",
+      "method": "GET",
+      "status": 404,
+      "ms": 352,
+      "assertions": 1,
+      "failed": 1,
+      "error": ""
+    },
+    {
+      "name": "NEG-05 — Nonexistent Pet ID",
+      "method": "GET",
+      "status": 404,
+      "ms": 329,
+      "assertions": 2,
+      "failed": 0,
+      "error": ""
+    },
+    {
+      "name": "NEG-06 — Create Pet Without Required Name",
+      "method": "POST",
+      "status": 200,
+      "ms": 442,
+      "assertions": 1,
+      "failed": 1,
+      "error": ""
+    },
+    {
+      "name": "NEG-07 - Invalid Pet Status",
+      "method": "GET",
+      "status": 200,
+      "ms": 320,
+      "assertions": 1,
+      "failed": 1,
+      "error": ""
+    },
+    {
+      "name": "AUTH-01 - Inventory Without API Key",
+      "method": "GET",
+      "status": 200,
+      "ms": 259,
+      "assertions": 2,
+      "failed": 1,
+      "error": ""
+    },
+    {
+      "name": "AUTH-02 - Inventory With Invalid API Key",
+      "method": "GET",
+      "status": 200,
+      "ms": 252,
+      "assertions": 2,
+      "failed": 1,
+      "error": ""
+    },
+    {
+      "name": "AUTH-03 - Login With Invalid Credentials",
+      "method": "GET",
+      "status": 200,
+      "ms": 253,
+      "assertions": 2,
+      "failed": 1,
+      "error": ""
+    }
+  ],
+  "failures": [
+    {
+      "request": "NEG-04 — Invalid Pet ID",
+      "test": "Invalid pet ID is rejected",
+      "message": "expected 404 to deeply equal 400"
+    },
+    {
+      "request": "NEG-06 — Create Pet Without Required Name",
+      "test": "Missing required name is rejected",
+      "message": "expected 200 to be within 400..499"
+    },
+    {
+      "request": "NEG-07 - Invalid Pet Status",
+      "test": "Invalid pet status is rejected",
+      "message": "expected response to have status code 400 but got 200"
+    },
+    {
+      "request": "AUTH-01 - Inventory Without API Key",
+      "test": "Missing API key should be rejected",
+      "message": "expected 200 to be one of [ 401, 403 ]"
+    },
+    {
+      "request": "AUTH-02 - Inventory With Invalid API Key",
+      "test": "Invalid API key should be rejected",
+      "message": "expected 200 to be one of [ 401, 403 ]"
+    },
+    {
+      "request": "AUTH-03 - Login With Invalid Credentials",
+      "test": "Invalid credentials are rejected",
+      "message": "expected response to have status code 400 but got 200"
+    }
+  ],
+  "limitations": [
+    "POS-15 is saved as an empty-URL GET with no assertions despite its Delete Test User name. It was preserved; it cannot delete the user.",
+    "NEG-03 uses username robendevs_qa_20261116_81; create/update use robendevs_qa_20261116_814. A passing 404 cannot prove deletion of the created user.",
+    "No saved updated-user verification exists. POS-13 verifies pre-update values and cannot be moved after update without changing its assertions.",
+    "Saved source has 52 assertions; the historical run also had 52. No source request UUIDs exist; names and case IDs were preserved. Generated SDK IDs are not recovered original IDs.",
+    "Export preserves folders; execution uses an in-memory flattened order to interleave deletion checks. No original assertions, request methods, URLs, headers or bodies were changed.",
+    "This is a custom explicit YAML mapping validated against the official v2.1 JSON schema and loaded by the Postman SDK. It is not a native Postman export or official v3 downgrade utility.",
+    "Shared demo data and fixed IDs can interfere with results. No retries or additional cleanup requests were added; created user and NEG-06 pet may remain.",
+    "Only public demo credential fixtures were retained. Returned cookies/session material is redacted in saved JSON/HTML. No private environment was exported.",
+    "Historical and current discrepancies need contract investigation; they are not automatically confirmed bugs or security vulnerabilities."
+  ]
+}

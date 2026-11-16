@@ -1,0 +1,14 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/user/robendevs_qa_20261116_81
+method: GET
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Deleted user returns 404\", () => {\r
+
+      \    pm.response.to.have.status(404);\r
+
+      });\r\n"
+    language: text/javascript
+order: 3000

@@ -1,0 +1,80 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": 202611160803,\r
+
+    \  \"name\": \"RoBenDevs QA Test Pet\",\r
+
+    \  \"category\": {\r
+
+    \    \"id\": 1,\r
+
+    \    \"name\": \"Dogs\"\r
+
+    \  },\r
+
+    \  \"photoUrls\": [\r
+
+    \    \"https://example.com/test-pet.jpg\"\r
+
+    \  ],\r
+
+    \  \"tags\": [\r
+
+    \    {\r
+
+    \      \"id\": 1,\r
+
+    \      \"name\": \"qa-test\"\r
+
+    \    }\r
+
+    \  ],\r
+
+    \  \"status\": \"available\"\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Pet creation succeeds\", function () {\r
+
+      \    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response is JSON\", function () {\r
+
+      \    pm.response.to.be.json;\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Created pet has correct details\", function () {\r
+
+      \    const pet = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(pet.id).to.eql(202611160803);\r
+
+      \    pm.expect(pet.name).to.eql(\"RoBenDevs QA Test Pet\");\r
+
+      \    pm.expect(pet.status).to.eql(\"available\");\r
+
+      });\r\n"
+    language: text/javascript
+order: 3000

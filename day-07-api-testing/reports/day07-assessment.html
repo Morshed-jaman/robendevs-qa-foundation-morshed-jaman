@@ -1,0 +1,89 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Day 7 API Testing QA Report</title><style>body{font:12px Arial;color:#172b4d;margin:24px}h1{color:#075985}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:11px Arial;line-height:1.55}@page{size:A4;margin:16mm}</style></head><body><h1>Day 7 · API Testing QA Report</h1><pre># Day 7 API Testing Assessment
+
+RoBenDevs QA Engineer Internship — 14-Day Foundation Programme
+
+Date: 16 November 2026 (Asia/Dhaka). Objective: execute the existing Swagger Petstore v2 collection and assess real response evidence.
+
+Application: Swagger Petstore v2. Base URL: https://petstore.swagger.io/v2. Tools: Node v22.23.5, Newman 4.6.1, newman-reporter-html 1.0.5, YAML, Ajv, Postman SDK and Chromium PDF.
+
+## Actual Newman results
+
+One iteration. 25 execution entries; 24 HTTP responses; 1 request errors. Assertions: 52 total, 46 passed, 6 failed.
+
+Duration: 9616 ms. Mean response: 318.3538461538461 ms. Started UTC: 2026-11-16T10:10:02.390Z. HTTP counts: {"200":19,"404":5}.
+
+| Category | Requests | Assertions | Passed | Failed |
+| --- | ---: | ---: | ---: | ---: |
+| POS | 15 | 36 | 36 | 0 |
+| NEG | 7 | 10 | 7 | 3 |
+| AUTH | 3 | 6 | 3 | 3 |
+
+## Historical Postman run (user supplied)
+
+25 requests; 52 assertions; 46 passed; 6 failed; 0 execution errors; duration 9.535 seconds; average response 341 ms. These historical results were not exported and are not Newman results.
+
+Historical observations: NEG-04 returned 404 instead of 400; NEG-06 missing name returned 200; NEG-07 invalid status returned 200; AUTH-01 missing key and AUTH-02 invalid key returned 200; AUTH-03 invalid credentials returned 200.
+
+## Current failing assertions and evidence
+
+- NEG-04 — Invalid Pet ID / Invalid pet ID is rejected: expected 404 to deeply equal 400
+- NEG-06 — Create Pet Without Required Name / Missing required name is rejected: expected 200 to be within 400..499
+- NEG-07 - Invalid Pet Status / Invalid pet status is rejected: expected response to have status code 400 but got 200
+- AUTH-01 - Inventory Without API Key / Missing API key should be rejected: expected 200 to be one of [ 401, 403 ]
+- AUTH-02 - Inventory With Invalid API Key / Invalid API key should be rejected: expected 200 to be one of [ 401, 403 ]
+- AUTH-03 - Login With Invalid Credentials / Invalid credentials are rejected: expected response to have status code 400 but got 200
+
+## Per-request results
+
+| Request | Method | Status | Time ms | Assertions | Failed | Request error |
+| --- | --- | --- | ---: | ---: | ---: | --- |
+| POS-03 - Create New Pet | POST | 200 | 1050 | 3 | 0 |  |
+| POS-04 - Get Pet by ID | GET | 200 | 246 | 3 | 0 |  |
+| POS-05 - Update Pet Details | PUT | 200 | 243 | 3 | 0 |  |
+| POS-06 - Verify Updated Pet | GET | 200 | 247 | 3 | 0 |  |
+| POS-07 - Delete Test Pet | DELETE | 200 | 245 | 2 | 0 |  |
+| NEG-01 - Verify Deleted Pet Returns 404 | GET | 404 | 251 | 2 | 0 |  |
+| POS-09 - Place Store Order | POST | 200 | 250 | 3 | 0 |  |
+| POS-10 - Get Store Order by ID | GET | 200 | 246 | 3 | 0 |  |
+| POS-11 — Delete Store Order | DELETE | 200 | 250 | 1 | 0 |  |
+| NEG-02 — Verify Deleted Order | GET | 404 | 252 | 2 | 0 |  |
+| POS-12 — Create User | POST | 200 | 247 | 2 | 0 |  |
+| POS-13 — Retrieve Created User | GET | 200 | 246 | 2 | 0 |  |
+| POS-14 — Update User | PUT | 200 | 255 | 2 | 0 |  |
+| POS-15 — Delete Test User | GET | NO RESPONSE | N/A | 0 | 0 |  |
+| NEG-03 — Verify Deleted User | GET | 404 | 341 | 1 | 0 |  |
+| POS-01 - Find Available Pets | GET | 200 | 564 | 3 | 0 |  |
+| POS-02 - Find Pending Pets | GET | 200 | 256 | 3 | 0 |  |
+| POS-08 - Get Store Inventory | GET | 200 | 253 | 3 | 0 |  |
+| NEG-04 — Invalid Pet ID | GET | 404 | 352 | 1 | 1 |  |
+| NEG-05 — Nonexistent Pet ID | GET | 404 | 329 | 2 | 0 |  |
+| NEG-06 — Create Pet Without Required Name | POST | 200 | 442 | 1 | 1 |  |
+| NEG-07 - Invalid Pet Status | GET | 200 | 320 | 1 | 1 |  |
+| AUTH-01 - Inventory Without API Key | GET | 200 | 259 | 2 | 1 |  |
+| AUTH-02 - Inventory With Invalid API Key | GET | 200 | 252 | 2 | 1 |  |
+| AUTH-03 - Login With Invalid Credentials | GET | 200 | 253 | 2 | 1 |  |
+
+## Methodology and limitations
+
+- POS-15 is saved as an empty-URL GET with no assertions despite its Delete Test User name. It was preserved; it cannot delete the user.
+- NEG-03 uses username robendevs_qa_20261116_81; create/update use robendevs_qa_20261116_814. A passing 404 cannot prove deletion of the created user.
+- No saved updated-user verification exists. POS-13 verifies pre-update values and cannot be moved after update without changing its assertions.
+- Saved source has 52 assertions; the historical run also had 52. No source request UUIDs exist; names and case IDs were preserved. Generated SDK IDs are not recovered original IDs.
+- Export preserves folders; execution uses an in-memory flattened order to interleave deletion checks. No original assertions, request methods, URLs, headers or bodies were changed.
+- This is a custom explicit YAML mapping validated against the official v2.1 JSON schema and loaded by the Postman SDK. It is not a native Postman export or official v3 downgrade utility.
+- Shared demo data and fixed IDs can interfere with results. No retries or additional cleanup requests were added; created user and NEG-06 pet may remain.
+- Only public demo credential fixtures were retained. Returned cookies/session material is redacted in saved JSON/HTML. No private environment was exported.
+- Historical and current discrepancies need contract investigation; they are not automatically confirmed bugs or security vulnerabilities.
+
+Execution sequence: POS-03 → POS-04 → POS-05 → POS-06 → POS-07 → NEG-01 → POS-09 → POS-10 → POS-11 → NEG-02 → POS-12 → POS-13 → POS-14 → POS-15 → NEG-03 → POS-01 → POS-02 → POS-08 → NEG-04 → NEG-05 → NEG-06 → NEG-07 → AUTH-01 → AUTH-02 → AUTH-03.
+
+## Contract discrepancies, conclusion and recommendations
+
+The [captured Swagger contract](reports/petstore-swagger-contract.json) documents 400 for invalid pet IDs and invalid status values; Pet requires name and photoUrls. Inventory declares api_key security, but its response definitions do not specify 401/403. Login documents 400 for invalid credentials. Order retrieval documents IDs 1–10, while the saved test uses 2026111609: this is a test-data contract limitation even though the request passed. See https://petstore.swagger.io/v2/swagger.json. Missing-name acceptance warrants required-field validation investigation; invalid-status acceptance warrants enum validation review; invalid-ID status warrants error-contract review. Authentication behavior on a public demonstration service needs confirmation of intended enforcement. No finding here is automatically a confirmed vulnerability.
+
+The evidence cannot establish complete user CRUD coverage. Repair POS-15, align NEG-03 username, and add a separate updated-user verification in a reviewed revision. Keep existing assertions intact until the contract is agreed. Re-run with isolated test data after repair. Inspect request failures separately from assertion failures.
+
+## Evidence
+
+[HTML](reports/day07-newman-report.html), [JSON](reports/day07-newman-results.json), [console](reports/day07-newman-console.txt), [PDF](reports/day07-api-testing-report.pdf), [conversion audit](reports/conversion-audit.json), [summary](reports/execution-summary.json).
+</pre></body></html>

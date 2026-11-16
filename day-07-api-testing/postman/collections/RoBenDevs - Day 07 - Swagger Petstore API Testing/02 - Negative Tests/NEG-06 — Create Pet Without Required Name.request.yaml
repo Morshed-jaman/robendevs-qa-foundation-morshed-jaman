@@ -1,0 +1,31 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet
+method: POST
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": 202611160899,\r
+
+    \  \"photoUrls\": [\r
+
+    \    \"https://example.com/test.jpg\"\r
+
+    \  ],\r
+
+    \  \"status\": \"available\"\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Missing required name is rejected\", () => {\r
+
+      \    pm.expect(pm.response.code).to.be.within(400, 499);\r
+
+      });\r\n"
+    language: text/javascript
+order: 6000

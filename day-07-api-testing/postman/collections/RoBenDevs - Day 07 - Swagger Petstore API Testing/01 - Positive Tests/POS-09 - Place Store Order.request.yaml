@@ -1,0 +1,59 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/store/order
+method: POST
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": 2026111609,\r
+
+    \  \"petId\": 202611160803,\r
+
+    \  \"quantity\": 1,\r
+
+    \  \"shipDate\": \"2026-11-16T08:50:00.000Z\",\r
+
+    \  \"status\": \"placed\",\r
+
+    \  \"complete\": false\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Order creation succeeds\", function () {\r
+
+      \    pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response is JSON\", function () {\r
+
+      \    pm.response.to.be.json;\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Created order details are correct\", function () {\r
+
+      \    const order = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(order.id).to.eql(2026111609);\r
+
+      \    pm.expect(order.quantity).to.eql(1);\r
+
+      \    pm.expect(order.status).to.eql(\"placed\");\r
+
+      \    pm.expect(order.complete).to.eql(false);\r
+
+      });\r\n"
+    language: text/javascript
+order: 9000

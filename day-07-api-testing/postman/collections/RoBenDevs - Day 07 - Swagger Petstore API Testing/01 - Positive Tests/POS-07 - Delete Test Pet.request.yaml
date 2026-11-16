@@ -1,0 +1,25 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet/202611160803
+method: DELETE
+headers:
+  api_key: special-key
+  Accept: application/json
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Delete request succeeds\", function () {\r
+
+      \    pm.expect(pm.response.code).to.be.oneOf([200, 204]);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Response has a successful status\", function () {\r
+
+      \    pm.expect(pm.response.code).to.be.within(200, 299);\r
+
+      });\r\n"
+    language: text/javascript
+order: 7000
