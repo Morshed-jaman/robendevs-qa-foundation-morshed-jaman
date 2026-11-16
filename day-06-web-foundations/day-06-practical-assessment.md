@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — ACT-01, ACT-02 and ACT-03 baseline PASS; 3/15 action runs verified**
+**Status:** **IN PROGRESS — ACT-01 through ACT-04 baseline PASS; 4/15 action runs verified**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01, ACT-02 and ACT-03 rows contain real Network/Console screenshots from 16 November 2026. The remaining **12 action runs are NOT RUN** (ACT-04 and ACT-05 baseline, plus ten throttled/storage-cleared runs). My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01, ACT-02 and ACT-03 rows contain real Network/Console screenshots from 16 November 2026. The remaining **11 action runs are NOT RUN** (ACT-05 baseline, plus ten throttled/storage-cleared runs). My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -77,7 +77,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 | ACT-01 — Login | `/web/index.php/auth/validate` → `/web/index.php/dashboard/index` | `POST` **302 Found** → `GET` **200 OK** | Dashboard rendered after login | **No errors or warnings visible** in captured Console view | Headers + Console screenshots supplied in conversation; no repository image files yet; exclude sensitive Payload screenshot | **PASS — baseline login flow** |
 | ACT-02 — Dashboard | `/web/index.php/dashboard/index` | **GET 200 OK** | Dashboard displayed after returning from PIM | **No errors visible** in captured Console view | Headers + Console screenshots supplied in conversation; repository image files pending | **PASS — baseline dashboard navigation** |
 | ACT-03 — PIM | `/web/index.php/pim/viewPimModule` → `/web/index.php/pim/viewEmployeeList`; employee list XHR also visible | **GET 302 Found → GET 200 OK** | PIM Employee List displayed; **178 Records Found** | **No errors visible** in captured Console view | Three PIM screenshots supplied in conversation; repository image files pending | **PASS — baseline PIM navigation** |
-| ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
+| ACT-04 — Employee search | `/web/index.php/api/v2/pim/employees?...` (query included `empNumber=114`) | **GET 200 OK**; `Content-Type: application/json` | PIM filtered to **1 Record Found: Joy Smith (employee ID 0321)** | No errors or warnings visible in captured Console | Network list, selected Headers, Response JSON and Console screenshots shared in conversation; repository images pending | **PASS — baseline employee search** |
 | ACT-05 — Logout | — | — | — | Not checked | — | **NOT RUN** |
 
 **Baseline findings — ACT-01 (observed 16 November 2026):**
@@ -95,7 +95,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Still to record:** exact browser version and screenshots added as repository evidence if submitting the final assessment. **ACT-02 is still pending as a distinct user-initiated dashboard action**; the redirect navigation above belongs to ACT-01.
 - **Evidence protection:** The Payload screenshot visibly includes the login password and a form token. **Do not publish that screenshot as-is.** Redact these values or use only the safe Headers screenshot.
 
-**ACT-04 and ACT-05:** NOT RUN for this Day 6 baseline. ACT-01, ACT-02 and ACT-03 have observed positive baseline outcomes.
+**ACT-05:** NOT RUN for this Day 6 baseline. ACT-01 through ACT-04 have observed positive baseline outcomes.
 
 ### ACT-02 — Dashboard navigation: verified evidence (16 November 2026)
 
@@ -119,6 +119,20 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Assessment status:** **PASS** for opening the PIM Employee List.
 - **Evidence handling:** Three screenshots were supplied in conversation; they are **not yet uploaded to GitHub**. Do not invent screenshot paths or claim files were attached to Jira.
 - **Next:** ACT-04 — Perform a non-destructive employee search and inspect its request/response and Console.
+
+### ACT-04 — Employee search: verified Network, UI, and JSON evidence (16 November 2026)
+
+- **Action:** Used PIM Employee Search to filter the employee records.
+- **Network request:** `GET /web/index.php/api/v2/pim/employees?...empNumber=114...` with the employee-list query parameters visible in Headers.
+- **HTTP result:** **200 OK**, with `Content-Type: application/json`.
+- **UI:** Employee list displayed **(1) Record Found**, **Joy Smith**, employee ID **0321**.
+- **Response JSON:** `data[0].empNumber = 114`, `data[0].firstName = "Joy"`, `data[0].lastName = "Smith"`, `data[0].employeeId = "0321"`, and `meta.total = 1`. These values **match the visible UI**, demonstrating API-to-UI consistency for this one tested record.
+- **Network request timing:** Approximately **619 ms** in the captured request list. This is a single request observation, not a benchmark or average.
+- **Console:** No errors or warnings were visible at capture time.
+- **Network configuration:** **No throttling**, Keep log enabled, Disable cache unchecked.
+- **Assessment verdict:** **PASS** for the observed employee search. No confirmed defect.
+- **Evidence status:** Four screenshots (Network request list, selected Headers, Console, and JSON Response) were shared during the conversation. **No screenshot file has yet been committed to GitHub.**
+- **Next action:** ACT-05 — Logout and inspect its response and Console.
 
 ## 6. Run B — Throttled Network
 
@@ -195,11 +209,11 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Fully verified actions | **3/5 (ACT-01, ACT-02, ACT-03)** | 0/5 | 0/5 |
+| Fully verified actions | **4/5 (ACT-01–ACT-04)** | 0/5 | 0/5 |
 | Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | Pending | Pending |
-| Main UI differences | Dashboard and PIM Employee List displayed; search/logout pending | Pending | Pending |
-| Console errors | **ACT-01–03: none visible in the respective captured Console views** | Not checked | Not checked |
-| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200` | Pending | Pending |
+| Main UI differences | Dashboard/PIM loaded; employee search matched API JSON; logout pending | Pending | Pending |
+| Console errors | **ACT-01–04: none visible in the respective captured Console views** | Not checked | Not checked |
+| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON | Pending | Pending |
 | Real defects confirmed | **None established yet** | **None established yet** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
@@ -223,7 +237,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Current outcome:** **Three baseline actions PASS** from actual screenshots: login `POST 302 → GET 200`, dashboard navigation `GET 200`, and PIM `GET 302 → GET 200` with visible Employee List. No Console errors were visible in the screenshots for those actions. **The remaining 12 action runs are NOT RUN**. Images still need secure selection/upload to repository.
+**Current outcome:** **Four baseline actions PASS** from actual screenshots: login `POST 302 → GET 200`, dashboard `GET 200`, PIM `GET 302 → GET 200`, and employee search `GET 200` JSON with one matching employee. No Console errors were visible in the captured views. **The remaining 11 action runs are NOT RUN** (logout and ten reruns); images still need selection and upload to repository.
 
 ## References
 
