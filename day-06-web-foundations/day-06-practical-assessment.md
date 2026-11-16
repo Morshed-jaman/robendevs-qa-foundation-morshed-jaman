@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — STARTER TEMPLATE, 0/15 ACTION RUNS VERIFIED**
+**Status:** **IN PROGRESS — ACT-01 baseline Network evidence captured; Console check pending; 0/15 action runs fully verified**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The rows below are **NOT RUN** until I actually use DevTools and record results. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. No screenshots or performance numbers are claimed as captured yet.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The ACT-01 baseline row now contains real Network evidence from 16 November 2026; all other action rows remain **NOT RUN**. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Three new ACT-01 screenshots were supplied in the assessment conversation; they are **not yet sanitized and uploaded as repository evidence**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -31,10 +31,10 @@ The site is a **public practice demo**. I will use its supported demo account, a
 | URL | https://opensource-demo.orangehrmlive.com/ |
 | Browser | Microsoft Edge / Chrome — **exact version to record** |
 | OS | Windows — **version to record** |
-| Test date/time | **To record for actual run (including timezone)** |
+| Test date/time | **ACT-01:** 16 November 2026; response Date header `05:02:28 GMT` (11:02:28 Asia/Dhaka). Other runs: to record |
 | Account | Public demo/test account; **never paste its password into the report** |
 | Environment/build | Live public demo; build/version **if displayed** |
-| Baseline network | DevTools `No throttling` — to verify in the actual run |
+| Baseline network | **No throttling** observed in ACT-01 screenshots (Keep log enabled, Disable cache unchecked) |
 | Throttled network | Named DevTools profile and its settings — to record |
 | Storage reset | Target origin and specific cleared categories — to record |
 | Data policy | Use non-destructive navigation/search actions |
@@ -74,13 +74,25 @@ The site is a **public practice demo**. I will use its supported demo account, a
 
 | Action | Relevant request(s) | Method & HTTP status | Actual UI observation | Console errors | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| ACT-01 — Login | — | — | — | Not checked | — | **NOT RUN** |
+| ACT-01 — Login | `/web/index.php/auth/validate` → redirect to `/web/index.php/dashboard/index` | `POST` · **302 Found** | Dashboard visibly loaded after form submission | **Not yet checked** | 3 conversation screenshots; sanitize/redact before repository upload | **PARTIAL — Console pending** |
 | ACT-02 — Dashboard | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-03 — PIM | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-05 — Logout | — | — | — | Not checked | — | **NOT RUN** |
 
-**Baseline findings:** Not yet observed.
+**Baseline findings — ACT-01 (observed 16 November 2026):**
+
+- **Application:** OrangeHRM public demo; browser was Microsoft Edge on Windows (exact versions not captured).
+- **Network setup:** recording enabled, **Keep log** checked, **No throttling** selected, and **Disable cache** unchecked.
+- **Relevant request:** `POST https://opensource-demo.orangehrmlive.com/web/index.php/auth/validate`.
+- **Observed status:** **302 Found**. Response header `Location` redirected to `https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index`.
+- **Additional response observations:** `Cache-Control: no-cache, private` and `Content-Type: text/html; charset=utf-8` were visible.
+- **Observed UI:** the Dashboard was rendered after login.
+- **Response panel:** DevTools displayed “Failed to load response data — No content available because this request was redirected.” This is **normal for the selected redirect** and is **not evidence of a bug**.
+- **Still to verify:** Console findings, the dashboard `index` request's actual status code, exact browser version, and sanitized screenshots attached to the repository. **Do not automatically mark PASS** without completing the evidence check.
+- **Evidence protection:** The Payload screenshot visibly includes the login password and a form token. **Do not publish that screenshot as-is.** Redact these values or use only the safe Headers screenshot.
+
+**ACT-02 through ACT-05:** NOT RUN for this Day 6 baseline.
 
 ## 6. Run B — Throttled Network
 
@@ -157,11 +169,11 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Completed actions | 0/5 | 0/5 | 0/5 |
+| Fully verified actions | 0/5 (ACT-01 partially documented; Console pending) | 0/5 | 0/5 |
 | Observed login behaviour | Pending | Pending | Pending |
 | Main UI differences | Pending | Pending | Pending |
 | Console errors | Not checked | Not checked | Not checked |
-| Recorded request statuses | Pending | Pending | Pending |
+| Recorded request statuses | ACT-01 POST `302 Found`; others pending | Pending | Pending |
 | Real defects confirmed | **None established yet** | **None established yet** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
@@ -185,7 +197,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Final outcome:** **PENDING — no new Day 6 actions recorded yet**.
+**Current outcome:** **ACT-01 normal-network login evidence recorded from actual screenshots; Console and dashboard request verification are still pending. The other 14 runs remain NOT RUN.**
 
 ## References
 
