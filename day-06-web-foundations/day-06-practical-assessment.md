@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — ACT-01 baseline Network evidence captured; Console check pending; 0/15 action runs fully verified**
+**Status:** **IN PROGRESS — ACT-01 baseline login PASS; 1/15 action runs verified**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The ACT-01 baseline row now contains real Network evidence from 16 November 2026; all other action rows remain **NOT RUN**. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Three new ACT-01 screenshots were supplied in the assessment conversation; they are **not yet sanitized and uploaded as repository evidence**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The ACT-01 baseline row now contains real Network and Console evidence from 16 November 2026; the remaining 14 planned action runs remain **NOT RUN**. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -74,7 +74,7 @@ The site is a **public practice demo**. I will use its supported demo account, a
 
 | Action | Relevant request(s) | Method & HTTP status | Actual UI observation | Console errors | Evidence | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| ACT-01 — Login | `/web/index.php/auth/validate` → redirect to `/web/index.php/dashboard/index` | `POST` · **302 Found** | Dashboard visibly loaded after form submission | **Not yet checked** | 3 conversation screenshots; sanitize/redact before repository upload | **PARTIAL — Console pending** |
+| ACT-01 — Login | `/web/index.php/auth/validate` → `/web/index.php/dashboard/index` | `POST` **302 Found** → `GET` **200 OK** | Dashboard rendered after login | **No errors or warnings visible** in captured Console view | Headers + Console screenshots supplied in conversation; no repository image files yet; exclude sensitive Payload screenshot | **PASS — baseline login flow** |
 | ACT-02 — Dashboard | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-03 — PIM | — | — | — | Not checked | — | **NOT RUN** |
 | ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
@@ -86,10 +86,13 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Network setup:** recording enabled, **Keep log** checked, **No throttling** selected, and **Disable cache** unchecked.
 - **Relevant request:** `POST https://opensource-demo.orangehrmlive.com/web/index.php/auth/validate`.
 - **Observed status:** **302 Found**. Response header `Location` redirected to `https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index`.
+- **Follow-up dashboard document:** `GET /web/index.php/dashboard/index` returned **200 OK** (verified in a new Headers screenshot).
 - **Additional response observations:** `Cache-Control: no-cache, private` and `Content-Type: text/html; charset=utf-8` were visible.
 - **Observed UI:** the Dashboard was rendered after login.
 - **Response panel:** DevTools displayed “Failed to load response data — No content available because this request was redirected.” This is **normal for the selected redirect** and is **not evidence of a bug**.
-- **Still to verify:** Console findings, the dashboard `index` request's actual status code, exact browser version, and sanitized screenshots attached to the repository. **Do not automatically mark PASS** without completing the evidence check.
+- **Console evidence:** The captured DevTools Console is empty under the shown filter/settings. **No errors or warnings were visible at capture time**; this is not proof none occurred earlier or under different settings.
+- **Assessment verdict:** **PASS** for the observed baseline login-to-dashboard flow (`POST 302` → `GET 200` and visible Dashboard).
+- **Still to record:** exact browser version and screenshots added as repository evidence if submitting the final assessment. **ACT-02 is still pending as a distinct user-initiated dashboard action**; the redirect navigation above belongs to ACT-01.
 - **Evidence protection:** The Payload screenshot visibly includes the login password and a form token. **Do not publish that screenshot as-is.** Redact these values or use only the safe Headers screenshot.
 
 **ACT-02 through ACT-05:** NOT RUN for this Day 6 baseline.
@@ -169,11 +172,11 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Fully verified actions | 0/5 (ACT-01 partially documented; Console pending) | 0/5 | 0/5 |
-| Observed login behaviour | Pending | Pending | Pending |
+| Fully verified actions | **1/5 (ACT-01)** | 0/5 | 0/5 |
+| Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | Pending | Pending |
 | Main UI differences | Pending | Pending | Pending |
-| Console errors | Not checked | Not checked | Not checked |
-| Recorded request statuses | ACT-01 POST `302 Found`; others pending | Pending | Pending |
+| Console errors | **ACT-01: none visible in captured Console** | Not checked | Not checked |
+| Recorded request statuses | ACT-01 `POST 302` and `GET 200`; other actions pending | Pending | Pending |
 | Real defects confirmed | **None established yet** | **None established yet** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
@@ -197,7 +200,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Current outcome:** **ACT-01 normal-network login evidence recorded from actual screenshots; Console and dashboard request verification are still pending. The other 14 runs remain NOT RUN.**
+**Current outcome:** **ACT-01 normal-network login PASS** from actual `POST 302` → `GET 200` Headers evidence, successful dashboard display and an empty Console view. **The other 14 distinct action runs remain NOT RUN.**
 
 ## References
 
