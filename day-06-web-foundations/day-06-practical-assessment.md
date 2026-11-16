@@ -4,7 +4,7 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — 12 action runs observed; Run C ACT-02 dashboard navigation PASS; ACT-03–05 pending**
+**Status:** **15/15 actions observed — Day 6 three-condition practical actions completed; evidence files and storage-clearing verification remain outstanding**
 
 > **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01 through ACT-05 rows have observed Network/UI evidence from 16 November 2026. **Four cleared-storage action runs are NOT RUN**. Run C ACT-01 first failed with a CSRF validation message, but a fresh-page login retry succeeded; actual storage-clearing completion was not independently verified. Actual storage-clearing completion is not yet independently verified. The five 3G-throttled actions have observed Network and UI evidence from the 16 November 2026 screenshots. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. Individual 3G request timings are recorded from DevTools screenshots, not invented page-load metrics; screenshot files themselves are not yet committed.
 
@@ -187,9 +187,9 @@ The site is a **public practice demo**. I will use its supported demo account, a
 | --- | --- | --- | --- | --- | --- | --- |
 | ACT-01 — Login | First `POST /auth/validate` → `/auth/login`; retry `POST /auth/validate` → `/dashboard/index` | **POST 302** on both attempts, but redirect destinations differed; retry dashboard displayed (follow-up GET status not separately inspected) | Initial login showed **“CSRF token validation failed”**; after page reload, login succeeded and Dashboard appeared. Actual storage clearing remains unverified | **No errors visible** in retry Console screenshot | Error screenshot, retry Headers and Console screenshots shared in conversation; files not in repository | **PASS ON RETRY — initial CSRF error retained as observation** |
 | ACT-02 — Dashboard | `/web/index.php/dashboard/index` | **GET 200 OK** | Dashboard returned after PIM navigation; widgets visible. Storage-clearing completion still unverified | **No Console messages visible** in captured view | Dashboard with selected Headers and Console screenshots supplied in conversation; repository image files pending | **PASS — observed dashboard navigation** |
-| ACT-03 — PIM | — | — | — | Not checked | — | **NOT RUN** |
-| ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
-| ACT-05 — Logout | — | — | — | Not checked | — | **NOT RUN** |
+| ACT-03 — PIM | `/web/index.php/pim/viewPimModule` → `viewEmployeeList` (visible request list) | **GET 302 Found** for `viewPimModule`; subsequent `viewEmployeeList` request present, individual selected Headers not captured | PIM Employee List displayed with **272 Records Found** in screenshot | No separate Console screenshot for ACT-03 | PIM UI + `viewPimModule` Headers screenshot supplied in conversation, not committed | **PASS — navigation/UI; follow-up status and Console partially unverified** |
+| ACT-04 — Employee search | `/web/index.php/api/v2/pim/employees?nameOrId=joy+smith&includeEmployees=onlyCurrent` and a related `employees?...` request | **GET 200 OK**, JSON response headers; two 200 XHR requests in list | **1 Record Found: Joy Smith (ID 0364)**; query/UI match. Request list showed **1.81 s** and **2.09 s** for the two XHRs | No separate Console screenshot for ACT-04 | Search UI + selected request Headers screenshot supplied in conversation, not committed | **PASS — search/API/UI; Console unverified** |
+| ACT-05 — Logout | `/web/index.php/auth/logout` → `/web/index.php/auth/login` | **GET 302 Found** and Location to login page | Login screen displayed | No visible errors under current filter; **1 hidden message** | Logout request Headers + Console screenshot supplied in conversation, not committed | **PASS — visible logout navigation** |
 
 **Storage-clearing selection observed:** Application → Storage for `https://opensource-demo.orangehrmlive.com/`; checkboxes were selected for Cache storage, File system, IndexedDB, Local and session storage, Cookies, and Unregister service workers; Third-party cookies unchecked. **The actual click/result of “Clear selected” was not shown**, so completion remains unverified.  
 **Cache also cleared?:** Cache storage was selected, but actual clearing outcome not independently confirmed.  
@@ -217,6 +217,15 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Console:** No messages visible in the provided Console screenshot at capture time; this does not confirm whether any hidden or earlier messages existed.
 - **Verdict:** **PASS** for the observed Dashboard navigation. The actual completion of the preceding storage clearing has not been independently demonstrated.
 - **Evidence:** Two screenshots supplied in conversation, **not yet uploaded** to GitHub.
+
+### ACT-03 to ACT-05 — final Run C evidence (16 November 2026)
+
+- **ACT-03 / PIM:** Selected request `GET /web/index.php/pim/viewPimModule` returned **302 Found**. Employee List UI loaded, showing **272 Records Found**. The `viewEmployeeList` request appears in the Network list, but its separate Headers/status were not selected in these screenshots.
+- **ACT-04 / Search:** Query included `nameOrId=joy+smith`; selected `GET /web/index.php/api/v2/pim/employees?... ` returned **200 OK** with JSON content. UI showed exactly one matching result, **Joy Smith, employee ID 0364**. Two related XHR rows showed **1.81 s** and **2.09 s**, respectively. These are single-request timings, not a benchmark. The record differs from earlier normal/3G runs because the public demo's data changed.
+- **ACT-05 / Logout:** `GET /web/index.php/auth/logout` returned **302 Found** and redirected to `/web/index.php/auth/login`. The login form appeared. Console screenshot showed no visible errors but **1 hidden message**.
+- **Run C limitations:** The site-data-clearing selection was captured, but there was no independent after-clear cookie inventory or completed-clear confirmation. Separate Console captures for ACT-03 and ACT-04 were not provided. No new Jira defect is confirmed. The uploaded screenshots have not yet been committed into GitHub.
+
+**Outcome:** Five Run C user actions were visibly performed; initial login had a CSRF error and succeeded on retry. Core HTTP/navigation/API checks passed as observed, subject to the evidence limitations stated above.
 
 ## 8. Individual Evidence Record Template
 
@@ -257,11 +266,11 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Observed completed actions | **5/5** | **5/5** (search Console capture pending) | **2/5 — ACT-01 passed on retry; ACT-02 passed** |
+| Observed completed actions | **5/5** | **5/5** (search Console capture pending) | **5/5** (login passed on retry; some Console/Headers evidence incomplete) |
 | Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | **POST 302 → dashboard GET 200; visible success** | **First POST 302 → login with CSRF error; retry POST 302 → dashboard, visible success** |
-| Main UI differences | Dashboard/PIM loaded, search matched API JSON, logout returned to login page | Same features loaded; request durations were longer in recorded examples; demo employee records differed | Login succeeded on retry and Dashboard opened; PIM/search/logout pending |
-| Console errors | **ACT-01–05: none visible in captured views; ACT-05 indicated 1 hidden message** | **No errors visible** in available Console captures; ACT-04 not independently captured; ACT-05 indicated 1 hidden message | **ACT-01 retry and ACT-02: no errors visible**; remaining not checked |
-| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | **ACT-01 initial POST 302 → login; retry POST 302 → dashboard; ACT-02 GET 200** |
+| Main UI differences | Dashboard/PIM loaded, search matched API JSON, logout returned to login page | Same features loaded; request durations were longer in recorded examples; demo employee records differed | Initial CSRF error; login recovered after refresh, dashboard/PIM/search/logout worked; demo employee data changed |
+| Console errors | **ACT-01–05: none visible in captured views; ACT-05 indicated 1 hidden message** | **No errors visible** in available Console captures; ACT-04 not independently captured; ACT-05 indicated 1 hidden message | **ACT-01 retry and ACT-02: no errors visible; ACT-03/04 not separately captured; ACT-05 one hidden message** |
+| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | ACT-01 initial `POST 302` → login and retry `POST 302` → dashboard; ACT-02 `GET 200`; ACT-03 `GET 302`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` |
 | Real defects confirmed | **None established** | **None established** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
@@ -285,7 +294,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Current outcome:** **Five normal-network actions and five 3G-throttled actions visibly passed their primary navigation/search checks**, with HTTP methods/statuses recorded. The throttled employee search took about **2.88 s**, versus about **619 ms** in the earlier normal-network example, but changing public-demo data makes this an indicative comparison only. Some Console evidence remains qualified (one hidden logout message, no independent search Console capture). **Run C ACT-01 initially showed a CSRF validation error but succeeded after a fresh-page login retry; ACT-02 Dashboard navigation returned GET 200 with a visible Dashboard; ACT-03–ACT-05 remain NOT RUN.** Evidence screenshots still need selected, sanitized uploads to GitHub.
+**Current outcome:** **Five normal-network actions and five 3G-throttled actions visibly passed their primary navigation/search checks**, with HTTP methods/statuses recorded. The throttled employee search took about **2.88 s**, versus about **619 ms** in the earlier normal-network example, but changing public-demo data makes this an indicative comparison only. Some Console evidence remains qualified (one hidden logout message, no independent search Console capture). **All five Run C actions were performed.** ACT-01 initially displayed a CSRF token validation error and succeeded on refresh/retry; ACT-02 Dashboard GET 200; ACT-03 PIM redirect GET 302 with employee list displayed; ACT-04 employee search GET 200 showing Joy Smith ID 0364; ACT-05 logout GET 302 to login. The absence of independent storage-clearing confirmation, some Console captures, and file-backed evidence is retained as a limitation. Evidence screenshots still need selected, sanitized uploads to GitHub.
 
 ## References
 
