@@ -4,9 +4,9 @@
 **Topic:** Web Foundations for Testers — Network, Console, Throttling and Storage  
 **Prepared:** 16 November 2026  
 **Application candidate:** [OrangeHRM Open-Source Demo](https://opensource-demo.orangehrmlive.com/)  
-**Status:** **IN PROGRESS — all five normal-network actions PASS; 5/15 action runs verified**
+**Status:** **IN PROGRESS — all five normal-network and five 3G-throttled actions PASS; 10/15 action runs observed**
 
-> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01 through ACT-05 rows have observed Network/UI evidence from 16 November 2026. **Ten action runs are NOT RUN** (five throttled-network and five cleared-storage reruns). My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. No new performance results are claimed.
+> **Evidence integrity:** The official Day 6 assignment requires inspecting **five user actions**, recording requests/status codes and Console errors, and repeating those flows under **network throttling** and **cleared browser storage**. The baseline ACT-01 through ACT-05 rows have observed Network/UI evidence from 16 November 2026. **Five action runs are NOT RUN** (all five cleared-storage reruns). The five 3G-throttled actions have observed Network and UI evidence from the 16 November 2026 screenshots. My earlier [QP-2 login investigation](https://g-team-qfw281wn.atlassian.net/browse/QP-2) is historical practice, **not a fresh Day 6 baseline measurement**. Five ACT-01 screenshots were supplied in the assessment conversation across two messages; they have **not yet been added as repository evidence files**. The Payload screenshot exposes credential/form-token values and **must not** be committed publicly. Individual 3G request timings are recorded from DevTools screenshots, not invented page-load metrics; screenshot files themselves are not yet committed.
 
 ## 1. Official Task and Submission Requirements
 
@@ -146,23 +146,38 @@ The site is a **public practice demo**. I will use its supported demo account, a
 - **Evidence:** Two screenshots supplied in the conversation; screenshot files not yet added to GitHub. The login page itself displays publicly provided demo credentials, but do not upload other screenshots exposing private tokens or credentials.
 - **Still optional to inspect:** The redirected `login` document's individual status/Headers and the hidden Console entry if relevant.
 
-## 6. Run B — Throttled Network
+## 6. Run B — Throttled Network (3G Preset)
 
-**Setup:** DevTools **Network → Throttling**, choose one explicit preset (such as a supported slower-network profile), and **record the exact selected profile**. Repeat the five actions in the same order. If the profile changes between actions, document that clearly.
+**Observed setup:** Microsoft Edge DevTools → Network → **3G** (exact label shown in screenshots); **Keep log** checked, **Disable cache** unchecked. The preset's throughput and latency configuration were **not recorded**, so it should not be renamed “Slow 3G” or assigned assumed rates.
 
-| Action | Relevant request(s) | Method & HTTP status / transport failure | Loading & UI difference vs baseline | Console errors | Evidence | Status |
-| --- | --- | --- | --- | --- | --- | --- |
-| ACT-01 — Login | — | — | — | Not checked | — | **NOT RUN** |
-| ACT-02 — Dashboard | — | — | — | Not checked | — | **NOT RUN** |
-| ACT-03 — PIM | — | — | — | Not checked | — | **NOT RUN** |
-| ACT-04 — Employee search | — | — | — | Not checked | — | **NOT RUN** |
-| ACT-05 — Logout | — | — | — | Not checked | — | **NOT RUN** |
+| Action | Relevant requests | Method / HTTP status | Visible result and measured single-request timing | Console evidence | Result |
+| --- | --- | --- | --- | --- | --- |
+| **ACT-01 — Login** | `/web/index.php/auth/validate` → dashboard `index` | **POST 302 Found** → **GET 200 OK** | Dashboard displayed; selected login request **2.45 s** total, with **2.05 s waiting for server response** | No errors visible in captured Console | **PASS** |
+| **ACT-02 — Dashboard** | `/web/index.php/dashboard/index` | **GET 200 OK** | Dashboard displayed after navigation; selected document request **2.05 s** total, **2.02 s waiting for server response** | No errors visible in captured Console | **PASS** |
+| **ACT-03 — PIM** | `/web/index.php/pim/viewPimModule` → `viewEmployeeList` | **GET 302 Found** → **GET 200 OK** | Employee List opened; recorded list count changed across screenshots (**212**, later **222**); selected `viewEmployeeList` request **2.44 s** total, **2.05 s waiting for server response** | No errors visible in captured Console | **PASS** |
+| **ACT-04 — Employee search** | `/web/index.php/api/v2/pim/employees?...nameOrId=joy...` and employee-list query including `empNumber=115` | **GET 200 OK**, JSON | One result: **Joy Smith**, employee ID **0322**; selected search request **2.88 s** total, **2.84 s waiting for server response** | No separate fresh Console capture for search in this batch; previous Console shows no visible error for the PIM page | **PASS (Network/UI); Console result not separately verified** |
+| **ACT-05 — Logout** | `/web/index.php/auth/logout` → login route | **GET 302 Found** | Login page displayed | No errors visible; **1 hidden** Console message indicated | **PASS (visible redirect/logout)** |
 
-**Profile name:** Not selected  
-**Profile configuration (if visible):** Not recorded  
-**Slow-network findings:** Not yet observed.
+### Verified evidence from supplied screenshots — 16 November 2026
 
-**QA interpretation:** Slowness alone is not necessarily a defect. Check whether loading/error states are acceptable and whether final actions succeed or fail appropriately.
+1. **ACT-01:** 3G selected; `validate` Headers showed POST/302 and `Location` to dashboard; dashboard document Headers showed GET/200; Timing showed about 2.45 s total for `validate`.
+2. **ACT-02:** Dashboard returned with GET/200; Timing recorded about 2.05 s for `index`.
+3. **ACT-03:** `viewPimModule` GET/302; `viewEmployeeList` GET/200; Timing recorded about 2.44 s for the employee-list document. Employee counts varied while the public demo was being used.
+4. **ACT-04:** A GET `employees` search request with `nameOrId=joy` showed 200; a follow-up employee list request with `empNumber=115` showed 200 and JSON. UI displayed **one Joy Smith record, ID 0322**. Timing of the search request was **2.88 s**.
+5. **ACT-05:** `auth/logout` GET/302 led to the login page. Console pane was visually empty, but indicated **1 hidden** message.
+
+### Comparison to normal-network captures
+
+- Earlier normal-network **ACT-04** request timing: approximately **619 ms**.
+- Throttled **ACT-04** request timing: approximately **2.88 s** (roughly **4.7×** the earlier duration).
+- **Limitation:** This is a *two-sample observation*, not a controlled benchmark. The public demo's employee data changed between runs (`0321` vs `0322`, and list totals changed), so differences cannot be attributed solely to throttling.
+- No confirmed test defect was observed. Slower responses under a simulated 3G profile are not inherently defects.
+- The screenshots were provided in conversation but **not uploaded as evidence files** to this GitHub repository. Do not invent screenshot filenames or Jira issue links.
+- A blank Console under the current filter does not guarantee there were no earlier or hidden messages.
+
+**Profile name:** `3G` (exact DevTools label)  
+**Profile configuration:** Not recorded  
+**Run B conclusion:** Five requested actions visibly completed with successful navigation/API statuses. Search Console was not independently documented for this particular action; capture it if strict per-action Console evidence is required.
 
 ## 7. Run C — Cleared Browser Storage
 
@@ -221,12 +236,12 @@ Use this for each of the **15 planned runs**.
 
 | Check | Baseline | Throttled | Storage cleared |
 | --- | --- | --- | --- |
-| Fully verified actions | **5/5 (ACT-01–ACT-05)** | 0/5 | 0/5 |
-| Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | Pending | Pending |
-| Main UI differences | Dashboard/PIM loaded, search matched API JSON, logout returned to login page | Pending | Pending |
-| Console errors | **ACT-01–05: none visible in captured views; ACT-05 Console indicated 1 hidden message** | Not checked | Not checked |
-| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | Pending | Pending |
-| Real defects confirmed | **None established yet** | **None established yet** | **None established yet** |
+| Observed completed actions | **5/5 (ACT-01–ACT-05)** | **5/5 (ACT-01–ACT-05; search Console capture pending)** | 0/5 |
+| Observed login behaviour | **POST 302 → dashboard GET 200; visible success** | **POST 302 → dashboard GET 200; visible success** | Pending |
+| Main UI differences | Dashboard/PIM loaded, search matched API JSON, logout returned to login page | Same features loaded; request durations were longer in recorded examples; demo employee records differed | Pending |
+| Console errors | **ACT-01–05: none visible in captured views; ACT-05 indicated 1 hidden message** | **No errors visible** in available Console captures; ACT-04 not independently captured; ACT-05 indicated 1 hidden message | Not checked |
+| Recorded request statuses | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | ACT-01 `POST 302` / `GET 200`; ACT-02 `GET 200`; ACT-03 `GET 302` / `GET 200`; ACT-04 `GET 200` JSON; ACT-05 `GET 302` | Pending |
+| Real defects confirmed | **None established** | **None established** | **None established yet** |
 
 **Analysis questions:** Did the same request sequence appear under each condition? Were redirects legitimate? Did slow loading change messages or cause timeouts? Did cleared storage change login state? Were observed errors reproducible? Which differences are explained by normal browser behaviour?
 
@@ -249,7 +264,7 @@ Use this for each of the **15 planned runs**.
 
 This assessment will demonstrate how I connect web fundamentals to real QA observation. I will compare browser requests, responses and visible UI behaviour under a normal network, a throttled connection, and cleared site storage. I will record actual findings rather than assume each HTTP 200 is valid or each redirect is a defect.
 
-**Current outcome:** **All five baseline actions PASS for the behaviours observed**: login `POST 302 → GET 200`, dashboard `GET 200`, PIM `GET 302 → GET 200`, employee search `GET 200` JSON with one matching employee, and logout `GET 302` returning to the login screen. Console screenshots showed no visible errors; the logout Console indicated **1 hidden message**. **Ten action runs remain NOT RUN** (five throttled, five cleared-storage). Evidence screenshots still need selected, sanitized uploads to GitHub.
+**Current outcome:** **Five normal-network actions and five 3G-throttled actions visibly passed their primary navigation/search checks**, with HTTP methods/statuses recorded. The throttled employee search took about **2.88 s**, versus about **619 ms** in the earlier normal-network example, but changing public-demo data makes this an indicative comparison only. Some Console evidence remains qualified (one hidden logout message, no independent search Console capture). **Five cleared-storage actions remain NOT RUN**. Evidence screenshots still need selected, sanitized uploads to GitHub.
 
 ## References
 
