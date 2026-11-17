@@ -1,6 +1,6 @@
 $kind: http-request
 url: https://petstore.swagger.io/v2/pet/{{day08PetId}}
-method: GET
+method: DELETE
 scripts:
   - type: afterResponse
     code: "\r

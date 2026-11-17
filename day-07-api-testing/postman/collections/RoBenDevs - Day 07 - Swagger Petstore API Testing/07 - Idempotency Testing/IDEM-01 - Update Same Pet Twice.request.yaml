@@ -1,6 +1,6 @@
 $kind: http-request
-url: IDEM-01 - Update Same Pet Twice
-method: GET
+url: https://petstore.swagger.io/v2/pet
+method: PUT
 body:
   type: json
   content: "\r
