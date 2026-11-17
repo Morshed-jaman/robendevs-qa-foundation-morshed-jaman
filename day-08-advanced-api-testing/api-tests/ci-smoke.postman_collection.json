@@ -1,0 +1,35 @@
+{
+  "info": {
+    "name": "Day 08 - GitHub Actions Newman Smoke Test",
+    "description": "Read-only CI smoke test of Swagger Petstore v2. Separate from the historical Day 07 collection.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "CI-01 - Find Available Pets",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "https://petstore.swagger.io/v2/pet/findByStatus?status=available",
+        "description": "Public demo endpoint. Does not create, update, or delete records."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"GET available pets returns 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response is a JSON array\", function () {",
+              "  const pets = pm.response.json();",
+              "  pm.expect(pets).to.be.an(\"array\");",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
