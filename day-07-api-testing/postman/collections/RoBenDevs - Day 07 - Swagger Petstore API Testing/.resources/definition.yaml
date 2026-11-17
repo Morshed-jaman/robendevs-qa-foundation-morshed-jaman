@@ -1,1 +1,3 @@
 $kind: collection
+variables:
+  day08PetId: ""

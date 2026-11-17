@@ -1,0 +1,106 @@
+$kind: http-request
+url: http://127.0.0.1:3000/state
+method: GET
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      const baseUrl = \"http://127.0.0.1:3000\";\r
+
+      let completed = 0;\r
+
+      let successfulPurchases = 0;\r
+
+      \r
+
+      // Send two purchase requests concurrently\r
+
+      for (let i = 1; i <= 2; i++) {\r
+
+      \    pm.sendRequest({\r
+
+      \        url: `${baseUrl}/buy-safe`,\r
+
+      \        method: \"POST\"\r
+
+      \    }, function (err, res) {\r
+
+      \r
+
+      \        if (!err && res.code === 200) {\r
+
+      \            successfulPurchases++;\r
+
+      \        }\r
+
+      \r
+
+      \        completed++;\r
+
+      \r
+
+      \        console.log(\r
+
+      \            `Purchase ${i}:`,\r
+
+      \            err ? err.message : res.code\r
+
+      \        );\r
+
+      \r
+
+      \        // Check the final result after both finish\r
+
+      \        if (completed === 2) {\r
+
+      \            pm.test(\"Only one purchase should succeed\", function () {\r
+
+      \                pm.expect(successfulPurchases).to.eql(1);\r
+
+      \            });\r
+
+      \r
+
+      \            pm.sendRequest(\r
+
+      \                `${baseUrl}/state`,\r
+
+      \                function (error, result) {\r
+
+      \                    pm.test(\"Inventory must not become negative\", function () {\r
+
+      \                        pm.expect(error).to.not.exist;\r
+
+      \                        pm.expect(result.code).to.eql(200);\r
+
+      \r
+
+      \                        const state = result.json();\r
+
+      \r
+
+      \                        pm.expect(state.stock).to.be.at.least(0);\r
+
+      \                        pm.expect(state.orders).to.be.at.most(1);\r
+
+      \                    });\r
+
+      \r
+
+      \                    if (!error && result.code === 200) {\r
+
+      \                        console.log(\"Final inventory:\", result.json());\r
+
+      \                    }\r
+
+      \                }\r
+
+      \            );\r
+
+      \        }\r
+
+      \    });\r
+
+      }\r\n"
+    language: text/javascript
+order: 7000

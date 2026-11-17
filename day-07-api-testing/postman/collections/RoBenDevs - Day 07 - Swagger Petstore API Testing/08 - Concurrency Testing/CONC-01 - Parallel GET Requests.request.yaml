@@ -1,0 +1,52 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet/findByStatus?status=available
+method: GET
+queryParams:
+  status: available
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      const url = \"https://petstore.swagger.io/v2/pet/findByStatus?status=available\";\r
+
+      \r
+
+      // Check the original request\r
+
+      pm.test(\"Original GET returns 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      // Send two additional requests asynchronously\r
+
+      for (let i = 1; i <= 2; i++) {\r
+
+      \r
+
+      \    pm.sendRequest(url, function (err, res) {\r
+
+      \r
+
+      \        pm.test(`Concurrent request ${i} succeeds`, function () {\r
+
+      \            pm.expect(err).to.not.exist;\r
+
+      \            pm.expect(res.code).to.eql(200);\r
+
+      \            pm.expect(res.json()).to.be.an(\"array\");\r
+
+      \        });\r
+
+      \r
+
+      \        console.log(`Request ${i} completed`);\r
+
+      \    });\r
+
+      }\r\n"
+    language: text/javascript
+order: 4000

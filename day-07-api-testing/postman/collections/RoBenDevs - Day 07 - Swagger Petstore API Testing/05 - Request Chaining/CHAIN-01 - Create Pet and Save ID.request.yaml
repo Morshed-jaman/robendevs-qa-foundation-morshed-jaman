@@ -1,0 +1,74 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet
+method: POST
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": 20261117142201,\r
+
+    \  \"name\": \"Day 08 Chained Pet\",\r
+
+    \  \"photoUrls\": [],\r
+
+    \  \"status\": \"available\"\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      const pet = pm.response.json();\r
+
+      const expectedId = 20261117142201;\r
+
+      \r
+
+      pm.test(\"Pet created successfully\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Created pet details are correct\", function () {\r
+
+      \    pm.expect(pet.id).to.eql(expectedId);\r
+
+      \    pm.expect(pet.name).to.eql(\"Day 08 Chained Pet\");\r
+
+      });\r
+
+      \r
+
+      if (\r
+
+      \    pm.response.code === 200 &&\r
+
+      \    pet.id === expectedId &&\r
+
+      \    pet.name === \"Day 08 Chained Pet\"\r
+
+      ) {\r
+
+      \    pm.collectionVariables.set(\r
+
+      \        \"day08PetId\",\r
+
+      \        String(pet.id)\r
+
+      \    );\r
+
+      } else {\r
+
+      \    pm.collectionVariables.unset(\"day08PetId\");\r
+
+      }\r\n"
+    language: text/javascript
+  - type: beforeRequest
+    code: ""
+    language: text/javascript
+order: 1000

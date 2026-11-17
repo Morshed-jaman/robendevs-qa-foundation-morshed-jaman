@@ -1,0 +1,12 @@
+$kind: http-request
+url: https://petstore.swagger.io/v2/pet/{{day08PetId}}
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"Pet deleted successfully\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });"
+    language: text/javascript
+order: 3000

@@ -1,0 +1,57 @@
+$kind: http-request
+url: IDEM-01 - Update Same Pet Twice
+method: GET
+body:
+  type: json
+  content: "\r
+
+    {\r
+
+    \  \"id\": {{day08PetId}},\r
+
+    \  \"name\": \"Day 08 Chained Pet\",\r
+
+    \  \"photoUrls\": [],\r
+
+    \  \"status\": \"sold\"\r
+
+    }\r\n"
+scripts:
+  - type: afterResponse
+    code: "\r
+
+      pm.test(\"Update returns status 200\", function () {\r
+
+      \    pm.response.to.have.status(200);\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Updated pet ID is correct\", function () {\r
+
+      \    const pet = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(pet.id).to.eql(\r
+
+      \        Number(pm.collectionVariables.get(\"day08PetId\"))\r
+
+      \    );\r
+
+      });\r
+
+      \r
+
+      pm.test(\"Pet status is sold\", function () {\r
+
+      \    const pet = pm.response.json();\r
+
+      \r
+
+      \    pm.expect(pet.status).to.eql(\"sold\");\r
+
+      });\r\n"
+    language: text/javascript
+order: 1000
