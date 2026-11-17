@@ -1,0 +1,322 @@
+{
+  "info": {
+    "name": "RoBenDevs Day 08 - Advanced API Assessment",
+    "description": "Supplementary Day 08 extension to Day 07 Petstore baseline. Public Petstore and local-only authorization requests; run selected folders separately, see assessment.md. Do not run writes against production.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://petstore.swagger.io/v2"
+    },
+    {
+      "key": "authBaseUrl",
+      "value": "http://127.0.0.1:3001"
+    },
+    {
+      "key": "day08PetId",
+      "value": ""
+    },
+    {
+      "key": "status",
+      "value": "available"
+    },
+    {
+      "key": "expectedCode",
+      "value": "200"
+    }
+  ],
+  "item": [
+    {
+      "name": "05 - Request Chaining",
+      "item": [
+        {
+          "name": "CHAIN-01 - Create Pet and Save ID",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/pet",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{day08PetId}}\",\n  \"name\": \"Day 08 Assessment Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// A fresh temporary ID per run; shared by the chained requests.",
+                  "pm.collectionVariables.set('day08PetId', String(Date.now()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const pet = pm.response.json();",
+                  "pm.test(\"Create returns 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Pet ID and name are returned\", () => {",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.name).to.eql(\"Day 08 Assessment Pet\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHAIN-02 - Get Pet By Saved ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/pet/{{day08PetId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"GET returns 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"GET retrieves same pet\", () => {",
+                  "  const pet=pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.name).to.eql(\"Day 08 Assessment Pet\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CHAIN-03 - Delete Assessment Pet",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/pet/{{day08PetId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"DELETE returns 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06 - JSON Schema Validation",
+      "item": [
+        {
+          "name": "SCHEMA-01 - Validate Available Pet List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/pet/findByStatus?status=available"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Response is 200\", () => pm.response.to.have.status(200));",
+                  "const schema = {type:\"array\",items:{type:\"object\",properties:{",
+                  "  id:{type:\"integer\"},name:{type:\"string\"},",
+                  "  photoUrls:{type:\"array\",items:{type:\"string\"}},",
+                  "  status:{type:\"string\"}",
+                  "}}};",
+                  "pm.test(\"Response matches JSON Schema\", () => pm.response.to.have.jsonSchema(schema));",
+                  "pm.test(\"All returned pets are available\", () => {",
+                  "  pm.response.json().forEach(pet => pm.expect(pet.status).to.eql(\"available\"));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Data Driven Tests",
+      "item": [
+        {
+          "name": "DDT-01 - Filter Pets by CSV Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/pet/findByStatus?status={{status}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const status=pm.iterationData.get(\"status\") || pm.variables.get(\"status\");",
+                  "const expectedCode=Number(pm.iterationData.get(\"expectedCode\") || pm.variables.get(\"expectedCode\"));",
+                  "pm.test(\"Expected HTTP code\", () => pm.response.to.have.status(expectedCode));",
+                  "pm.test(\"Response is an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                  "pm.test(\"Pets match requested status\", () => {",
+                  "  pm.response.json().forEach(pet => pm.expect(pet.status).to.eql(status));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 - Idempotency Testing",
+      "item": [
+        {
+          "name": "IDEM-01 - Repeat Identical PUT (run twice)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": "{{baseUrl}}/pet",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"{{day08PetId}}\",\n  \"name\": \"Day 08 Assessment Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PUT returns 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"ID and status match request\", () => {",
+                  "  const pet=pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.status).to.eql(\"sold\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IDEM-02 - Verify Final Pet State",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/pet/{{day08PetId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Final pet status is sold\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  const pet=pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.status).to.eql(\"sold\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "09 - Authorization Testing (Local Lab)",
+      "item": [
+        {
+          "name": "AUTHZ-01 - User A reads own profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer demo-token-a"
+              }
+            ],
+            "url": "{{authBaseUrl}}/users/user-a"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Own profile accessible\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().id).to.eql(\"user-a\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AUTHZ-02 - User A denied access to User B",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer demo-token-a"
+              }
+            ],
+            "url": "{{authBaseUrl}}/users/user-b"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Other user's profile is forbidden\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "AUTHZ-03 - No token is unauthorized",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{authBaseUrl}}/users/user-a"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Missing token returns 401\", () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
