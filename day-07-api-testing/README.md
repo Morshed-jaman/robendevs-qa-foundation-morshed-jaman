@@ -44,3 +44,9 @@ POS-15 is an empty-URL GET; NEG-03 uses a different username; no updated-user ve
 Export preserves source folders. Newman runs a derived in-memory list to interleave deletion checks, then independent negatives/authentication. Source UUIDs are absent; names and case identifiers are retained. Historical Postman results (52 assertions, 46 passed, 6 failed) are separately identified in the assessment; no previous run was exported.
 
 References: [Postman collection schemas](https://learning.postman.com/docs/use/use-collections/collections-schemas), [Petstore contract](https://petstore.swagger.io/v2/swagger.json).
+
+## Day 7 baseline vs. Day 8 extensions
+
+The reports above represent the **Day 7 baseline (25 requests)** from 16 November 2026. On 17 November, I extended the same Postman Local View workspace with `04 - Data Driven Tests/DDT-01 - Filter Pets by Status` and a staging environment as part of **Day 8 — Advanced API Testing**. These additions are saved under the original `day-07-api-testing/postman/` workspace because they extend that collection; they do **not** change the historical Day 7 Newman report or its 25-request baseline.
+
+The Day 8 CSV file, learning notes and separate CLI run evidence are documented in [Day 8 — Advanced API Testing](../day-08-advanced-api-testing/). Treat the new DDT request as **Day 8 practical work**, not an additional Day 7 result.
