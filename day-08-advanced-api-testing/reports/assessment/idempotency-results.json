@@ -1,0 +1,2062 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "d693dd4c-2948-45df-ac5f-0f78a330d8f8",
+        "name": "05 - Request Chaining",
+        "item": [
+          {
+            "id": "120605ff-8fdc-46ca-ad09-b56002f1f999",
+            "name": "CHAIN-01 - Create Pet and Save ID",
+            "request": {
+              "url": {
+                "path": [
+                  "pet"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Assessment Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "id": "2dfbadd7-348c-4aa0-b407-b32b7feea790",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// A fresh temporary ID per run; shared by the chained requests.",
+                    "pm.collectionVariables.set('day08PetId', String(Date.now()));"
+                  ]
+                }
+              },
+              {
+                "listen": "test",
+                "script": {
+                  "id": "3e3804b4-715c-43d5-9379-1e2f7b2dc165",
+                  "type": "text/javascript",
+                  "exec": [
+                    "const pet = pm.response.json();",
+                    "pm.test(\"Create returns 200\", () => pm.response.to.have.status(200));",
+                    "pm.test(\"Pet ID and name are returned\", () => {",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.name).to.eql(\"Day 08 Assessment Pet\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "656bbb88-40ae-4dbb-ae2e-7ae534bba022",
+            "name": "CHAIN-02 - Get Pet By Saved ID",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "0b89de13-5185-450e-a701-2a3a70eee459",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"GET returns 200\", () => pm.response.to.have.status(200));",
+                    "pm.test(\"GET retrieves same pet\", () => {",
+                    "  const pet=pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.name).to.eql(\"Day 08 Assessment Pet\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "8d326500-2f19-4ffb-b41e-19265f039975",
+            "name": "CHAIN-03 - Delete Assessment Pet",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "DELETE"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "281a5006-dab0-4f49-830f-99c00d585189",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"DELETE returns 200\", () => pm.response.to.have.status(200));"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "c8736a94-021b-41c0-9d53-690b38bf2a9d",
+        "name": "06 - JSON Schema Validation",
+        "item": [
+          {
+            "id": "2ba29c90-e5b4-4851-b8f6-3bde16d62845",
+            "name": "SCHEMA-01 - Validate Available Pet List",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "findByStatus"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "available"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "2e42a381-3f24-44f1-adcc-66a518445c40",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Response is 200\", () => pm.response.to.have.status(200));",
+                    "const schema = {type:\"array\",items:{type:\"object\",properties:{",
+                    "  id:{type:\"integer\"},name:{type:\"string\"},",
+                    "  photoUrls:{type:\"array\",items:{type:\"string\"}},",
+                    "  status:{type:\"string\"}",
+                    "}}};",
+                    "pm.test(\"Response matches JSON Schema\", () => pm.response.to.have.jsonSchema(schema));",
+                    "pm.test(\"All returned pets are available\", () => {",
+                    "  pm.response.json().forEach(pet => pm.expect(pet.status).to.eql(\"available\"));",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "b8110c08-c3b6-4163-a9a0-ad9236e8fdb3",
+        "name": "04 - Data Driven Tests",
+        "item": [
+          {
+            "id": "80677943-fd85-48d4-a208-770c9c610ceb",
+            "name": "DDT-01 - Filter Pets by CSV Status",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "findByStatus"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "{{status}}"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "4f195fa8-013c-4e87-bc0d-652e9b36673b",
+                  "type": "text/javascript",
+                  "exec": [
+                    "const status=pm.iterationData.get(\"status\") || pm.variables.get(\"status\");",
+                    "const expectedCode=Number(pm.iterationData.get(\"expectedCode\") || pm.variables.get(\"expectedCode\"));",
+                    "pm.test(\"Expected HTTP code\", () => pm.response.to.have.status(expectedCode));",
+                    "pm.test(\"Response is an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                    "pm.test(\"Pets match requested status\", () => {",
+                    "  pm.response.json().forEach(pet => pm.expect(pet.status).to.eql(status));",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "a5494526-95e6-4665-b2c4-b3a8c84772c2",
+        "name": "07 - Idempotency Testing",
+        "item": [
+          {
+            "id": "af92a04f-adcb-4830-a3ac-339341a943a2",
+            "name": "IDEM-00 - Create Disposable Pet",
+            "request": {
+              "url": {
+                "path": [
+                  "pet"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "id": "837860c9-5063-4a34-8dab-7ba8f67699a2",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.collectionVariables.set(\"day08PetId\", String(Date.now()));"
+                  ],
+                  "_lastExecutionId": "2d69d1cb-a69f-4d3e-bf08-71cb23e90872"
+                }
+              },
+              {
+                "listen": "test",
+                "script": {
+                  "id": "d0194624-4db5-40dd-a799-96331b3ad655",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Pet setup returns 200\", function () { pm.response.to.have.status(200); });",
+                    "pm.test(\"Pet created with expected ID\", function () {",
+                    "  const pet=pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "});"
+                  ],
+                  "_lastExecutionId": "b0f97634-886f-4206-bf43-02e4691fa686"
+                }
+              }
+            ]
+          },
+          {
+            "id": "4eeda271-e093-41cf-8761-0c8c0677297e",
+            "name": "IDEM-01A - First PUT",
+            "request": {
+              "url": {
+                "path": [
+                  "pet"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "PUT",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "2b59bbd5-bcc5-4151-969c-98a97263c81d",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"PUT returns 200\", function () { pm.response.to.have.status(200); });",
+                    "pm.test(\"PUT returns correct ID and sold status\", function () {",
+                    "  const pet = pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.status).to.eql(\"sold\");",
+                    "});"
+                  ],
+                  "_lastExecutionId": "57aa8e9f-dc52-419e-97f0-029d4e53675b"
+                }
+              }
+            ]
+          },
+          {
+            "id": "f9ccc2d3-5906-433d-b5d4-495b0908ffbf",
+            "name": "IDEM-01B - Second Identical PUT",
+            "request": {
+              "url": {
+                "path": [
+                  "pet"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "PUT",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "3fcaa0b3-2cdd-438c-929a-0323511b9973",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"PUT returns 200\", function () { pm.response.to.have.status(200); });",
+                    "pm.test(\"PUT returns correct ID and sold status\", function () {",
+                    "  const pet = pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.status).to.eql(\"sold\");",
+                    "});"
+                  ],
+                  "_lastExecutionId": "5081a98b-0276-4cf6-b827-743facd4c9f5"
+                }
+              }
+            ]
+          },
+          {
+            "id": "ddb0bbc9-6b53-4854-90b0-c9578b59283a",
+            "name": "IDEM-02 - Verify Final State",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "7404642b-b0eb-4c91-bc25-88cd2d7a1460",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Final GET returns 200\", function () { pm.response.to.have.status(200); });",
+                    "pm.test(\"Final pet state has same ID and sold status\", function () {",
+                    "  const pet = pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.name).to.eql(\"Day 08 Idempotency Pet\");",
+                    "  pm.expect(pet.status).to.eql(\"sold\");",
+                    "});"
+                  ],
+                  "_lastExecutionId": "126b5914-81ea-4624-bc95-0ed04f4608bb"
+                }
+              }
+            ]
+          },
+          {
+            "id": "07ef1eeb-16a1-441d-b172-4b6400455b6e",
+            "name": "IDEM-03 - Delete Disposable Pet",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "DELETE"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "78947d02-0688-4b41-8ecf-7a39bb0beb06",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Cleanup DELETE returns 200\", function () { pm.response.to.have.status(200); });"
+                  ],
+                  "_lastExecutionId": "ccaf3803-ba8e-4d6d-b3cf-cf2de2432584"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "ad29c50c-9b37-4010-8660-9ebc906e5b68",
+        "name": "09 - Authorization Testing (Local Lab)",
+        "item": [
+          {
+            "id": "24516f5c-8100-4658-b6bd-27b1d4401ef3",
+            "name": "AUTHZ-01 - User A reads own profile",
+            "request": {
+              "url": {
+                "path": [
+                  "users",
+                  "user-a"
+                ],
+                "host": [
+                  "{{authBaseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer demo-token-a"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "724ed95e-169c-4044-bb7a-bfe8683785b4",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Own profile accessible\", () => {",
+                    "  pm.response.to.have.status(200);",
+                    "  pm.expect(pm.response.json().id).to.eql(\"user-a\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "0b475fc4-a61f-4e6c-a710-4729dbf9ab9e",
+            "name": "AUTHZ-02 - User A denied access to User B",
+            "request": {
+              "url": {
+                "path": [
+                  "users",
+                  "user-b"
+                ],
+                "host": [
+                  "{{authBaseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer demo-token-a"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "686ebfa4-9e3b-42ff-b3c3-b78d813c5644",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Other user's profile is forbidden\", () => pm.response.to.have.status(403));"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "248ec107-a6dc-4cf9-911f-ce7d81e51eb7",
+            "name": "AUTHZ-03 - No token is unauthorized",
+            "request": {
+              "url": {
+                "path": [
+                  "users",
+                  "user-a"
+                ],
+                "host": [
+                  "{{authBaseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "824f7272-cbbb-4dc1-929d-e25e1d7d08a9",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Missing token returns 401\", () => pm.response.to.have.status(401));"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "any",
+        "value": "https://petstore.swagger.io/v2",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "http://127.0.0.1:3001",
+        "key": "authBaseUrl"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "day08PetId"
+      },
+      {
+        "type": "any",
+        "value": "available",
+        "key": "status"
+      },
+      {
+        "type": "any",
+        "value": "200",
+        "key": "expectedCode"
+      }
+    ],
+    "info": {
+      "_postman_id": "6d3326ae-260b-404c-b679-cfc7ea8526f3",
+      "name": "RoBenDevs Day 08 - Advanced API Assessment",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Supplementary Day 08 extension to Day 07 Petstore baseline. Public Petstore and local-only authorization requests; run selected folders separately, see assessment.md. Do not run writes against production.",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2026-11-17T00:00:00.000Z",
+      "postman_exported_using": "Assessment preparation"
+    },
+    "id": "day08-demo-public",
+    "name": "Day 08 - Petstore Demo",
+    "values": [
+      {
+        "type": "any",
+        "value": "https://petstore.swagger.io/v2",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "http://127.0.0.1:3001",
+        "key": "authBaseUrl"
+      }
+    ]
+  },
+  "globals": {
+    "id": "bc320f41-546a-487d-9a5a-0cc10dd9d614",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 6,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 9,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 5,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 580.2,
+      "responseMin": 283,
+      "responseMax": 1544,
+      "responseSd": 483.2123342796622,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1794913360690,
+      "completed": 1794913363958
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 5,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "33c1483e-cc81-496e-8692-83df6694eec4",
+          "httpRequestId": "5f7ab62c-1056-4ddd-be8d-2ae516e0e719"
+        },
+        "item": {
+          "id": "af92a04f-adcb-4830-a3ac-339341a943a2",
+          "name": "IDEM-00 - Create Disposable Pet",
+          "request": {
+            "url": {
+              "path": [
+                "pet"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "837860c9-5063-4a34-8dab-7ba8f67699a2",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"day08PetId\", String(Date.now()));"
+                ],
+                "_lastExecutionId": "2d69d1cb-a69f-4d3e-bf08-71cb23e90872"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "d0194624-4db5-40dd-a799-96331b3ad655",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pet setup returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Pet created with expected ID\", function () {",
+                  "  const pet=pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "});"
+                ],
+                "_lastExecutionId": "b0f97634-886f-4206-bf43-02e4691fa686"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "v2",
+              "pet"
+            ],
+            "host": [
+              "petstore",
+              "swagger",
+              "io"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "c939fb41-8ccd-4a5a-b207-bf3276c39e08",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "petstore.swagger.io",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": 105,
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id\": 1794913360708,\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "b18e5304-1c8b-43da-b465-91b59aed78d3",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 11:02:42 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, DELETE, PUT"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, api_key, Authorization"
+            },
+            {
+              "key": "Server",
+              "value": "Jetty(9.2.9.v20150224)"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              55,
+              57,
+              52,
+              57,
+              49,
+              51,
+              51,
+              54,
+              48,
+              55,
+              48,
+              56,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              68,
+              97,
+              121,
+              32,
+              48,
+              56,
+              32,
+              73,
+              100,
+              101,
+              109,
+              112,
+              111,
+              116,
+              101,
+              110,
+              99,
+              121,
+              32,
+              80,
+              101,
+              116,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              116,
+              111,
+              85,
+              114,
+              108,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              116,
+              97,
+              103,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              97,
+              118,
+              97,
+              105,
+              108,
+              97,
+              98,
+              108,
+              101,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 1544,
+          "responseSize": 98
+        },
+        "id": "af92a04f-adcb-4830-a3ac-339341a943a2",
+        "assertions": [
+          {
+            "assertion": "Pet setup returns 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Pet created with expected ID",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "8e4e6275-85a5-4b2f-8a51-d8d216143758",
+          "length": 5,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "281fd67b-9a98-44b8-97d0-d56fd42a9335"
+        },
+        "item": {
+          "id": "4eeda271-e093-41cf-8761-0c8c0677297e",
+          "name": "IDEM-01A - First PUT",
+          "request": {
+            "url": {
+              "path": [
+                "pet"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "2b59bbd5-bcc5-4151-969c-98a97263c81d",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PUT returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PUT returns correct ID and sold status\", function () {",
+                  "  const pet = pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.status).to.eql(\"sold\");",
+                  "});"
+                ],
+                "_lastExecutionId": "57aa8e9f-dc52-419e-97f0-029d4e53675b"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "v2",
+              "pet"
+            ],
+            "host": [
+              "petstore",
+              "swagger",
+              "io"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "9ce50472-020b-4b51-9069-7882c7d75ef7",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "petstore.swagger.io",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": 100,
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id\": 1794913360708,\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "4453d2b4-cd12-40d5-82ca-98e0c7358664",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 11:02:42 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, DELETE, PUT"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, api_key, Authorization"
+            },
+            {
+              "key": "Server",
+              "value": "Jetty(9.2.9.v20150224)"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              55,
+              57,
+              52,
+              57,
+              49,
+              51,
+              51,
+              54,
+              48,
+              55,
+              48,
+              56,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              68,
+              97,
+              121,
+              32,
+              48,
+              56,
+              32,
+              73,
+              100,
+              101,
+              109,
+              112,
+              111,
+              116,
+              101,
+              110,
+              99,
+              121,
+              32,
+              80,
+              101,
+              116,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              116,
+              111,
+              85,
+              114,
+              108,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              116,
+              97,
+              103,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              115,
+              111,
+              108,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 390,
+          "responseSize": 93
+        },
+        "id": "4eeda271-e093-41cf-8761-0c8c0677297e",
+        "assertions": [
+          {
+            "assertion": "PUT returns 200",
+            "skipped": false
+          },
+          {
+            "assertion": "PUT returns correct ID and sold status",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "127654dd-ed10-45ea-b096-7f5ca925b68d",
+          "length": 5,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "96f03c61-69b5-4fc5-8cd8-3149578bc606"
+        },
+        "item": {
+          "id": "f9ccc2d3-5906-433d-b5d4-495b0908ffbf",
+          "name": "IDEM-01B - Second Identical PUT",
+          "request": {
+            "url": {
+              "path": [
+                "pet"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "PUT",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "3fcaa0b3-2cdd-438c-929a-0323511b9973",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PUT returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PUT returns correct ID and sold status\", function () {",
+                  "  const pet = pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.status).to.eql(\"sold\");",
+                  "});"
+                ],
+                "_lastExecutionId": "5081a98b-0276-4cf6-b827-743facd4c9f5"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "v2",
+              "pet"
+            ],
+            "host": [
+              "petstore",
+              "swagger",
+              "io"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "aea200e7-d84e-49be-b0c4-e9bfc2afa696",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "petstore.swagger.io",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": 100,
+              "system": true
+            }
+          ],
+          "method": "PUT",
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"id\": 1794913360708,\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+            "options": {
+              "raw": {
+                "language": "json"
+              }
+            }
+          }
+        },
+        "response": {
+          "id": "d03fc425-1f3f-465b-8ae6-3c294101b57d",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 11:02:43 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, DELETE, PUT"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, api_key, Authorization"
+            },
+            {
+              "key": "Server",
+              "value": "Jetty(9.2.9.v20150224)"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              55,
+              57,
+              52,
+              57,
+              49,
+              51,
+              51,
+              54,
+              48,
+              55,
+              48,
+              56,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              68,
+              97,
+              121,
+              32,
+              48,
+              56,
+              32,
+              73,
+              100,
+              101,
+              109,
+              112,
+              111,
+              116,
+              101,
+              110,
+              99,
+              121,
+              32,
+              80,
+              101,
+              116,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              116,
+              111,
+              85,
+              114,
+              108,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              116,
+              97,
+              103,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              115,
+              111,
+              108,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 283,
+          "responseSize": 93
+        },
+        "id": "f9ccc2d3-5906-433d-b5d4-495b0908ffbf",
+        "assertions": [
+          {
+            "assertion": "PUT returns 200",
+            "skipped": false
+          },
+          {
+            "assertion": "PUT returns correct ID and sold status",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "cf3d8c91-a5f0-40c2-99e5-b32d258cf7ad",
+          "length": 5,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "04001895-024d-44f8-9537-fefd6aba15bc"
+        },
+        "item": {
+          "id": "ddb0bbc9-6b53-4854-90b0-c9578b59283a",
+          "name": "IDEM-02 - Verify Final State",
+          "request": {
+            "url": {
+              "path": [
+                "pet",
+                "{{day08PetId}}"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "7404642b-b0eb-4c91-bc25-88cd2d7a1460",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Final GET returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Final pet state has same ID and sold status\", function () {",
+                  "  const pet = pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.name).to.eql(\"Day 08 Idempotency Pet\");",
+                  "  pm.expect(pet.status).to.eql(\"sold\");",
+                  "});"
+                ],
+                "_lastExecutionId": "126b5914-81ea-4624-bc95-0ed04f4608bb"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "v2",
+              "pet",
+              "1794913360708"
+            ],
+            "host": [
+              "petstore",
+              "swagger",
+              "io"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "655dbd93-fdb4-4246-b38f-54211b3994a1",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "petstore.swagger.io",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "dd7ee1b8-b986-4f74-8389-fd157d96eb0a",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 11:02:43 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, DELETE, PUT"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, api_key, Authorization"
+            },
+            {
+              "key": "Server",
+              "value": "Jetty(9.2.9.v20150224)"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              55,
+              57,
+              52,
+              57,
+              49,
+              51,
+              51,
+              54,
+              48,
+              55,
+              48,
+              56,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              68,
+              97,
+              121,
+              32,
+              48,
+              56,
+              32,
+              73,
+              100,
+              101,
+              109,
+              112,
+              111,
+              116,
+              101,
+              110,
+              99,
+              121,
+              32,
+              80,
+              101,
+              116,
+              34,
+              44,
+              34,
+              112,
+              104,
+              111,
+              116,
+              111,
+              85,
+              114,
+              108,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              116,
+              97,
+              103,
+              115,
+              34,
+              58,
+              91,
+              93,
+              44,
+              34,
+              115,
+              116,
+              97,
+              116,
+              117,
+              115,
+              34,
+              58,
+              34,
+              115,
+              111,
+              108,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 325,
+          "responseSize": 93
+        },
+        "id": "ddb0bbc9-6b53-4854-90b0-c9578b59283a",
+        "assertions": [
+          {
+            "assertion": "Final GET returns 200",
+            "skipped": false
+          },
+          {
+            "assertion": "Final pet state has same ID and sold status",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "5d3159d1-e145-49d2-92a9-b18f06be7566",
+          "length": 5,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "f346a101-89d0-48cd-99a3-d5de0e204e51"
+        },
+        "item": {
+          "id": "07ef1eeb-16a1-441d-b172-4b6400455b6e",
+          "name": "IDEM-03 - Delete Disposable Pet",
+          "request": {
+            "url": {
+              "path": [
+                "pet",
+                "{{day08PetId}}"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "DELETE"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "78947d02-0688-4b41-8ecf-7a39bb0beb06",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cleanup DELETE returns 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "_lastExecutionId": "ccaf3803-ba8e-4d6d-b3cf-cf2de2432584"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "v2",
+              "pet",
+              "1794913360708"
+            ],
+            "host": [
+              "petstore",
+              "swagger",
+              "io"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "77d16187-40fe-452a-a68f-c0b2e68f49e6",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "petstore.swagger.io",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "DELETE"
+        },
+        "response": {
+          "id": "fa933042-efda-4295-ada4-f6f630573d61",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 11:02:43 GMT"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "key": "Access-Control-Allow-Methods",
+              "value": "GET, POST, DELETE, PUT"
+            },
+            {
+              "key": "Access-Control-Allow-Headers",
+              "value": "Content-Type, api_key, Authorization"
+            },
+            {
+              "key": "Server",
+              "value": "Jetty(9.2.9.v20150224)"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              99,
+              111,
+              100,
+              101,
+              34,
+              58,
+              50,
+              48,
+              48,
+              44,
+              34,
+              116,
+              121,
+              112,
+              101,
+              34,
+              58,
+              34,
+              117,
+              110,
+              107,
+              110,
+              111,
+              119,
+              110,
+              34,
+              44,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              49,
+              55,
+              57,
+              52,
+              57,
+              49,
+              51,
+              51,
+              54,
+              48,
+              55,
+              48,
+              56,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 359,
+          "responseSize": 55
+        },
+        "id": "07ef1eeb-16a1-441d-b172-4b6400455b6e",
+        "assertions": [
+          {
+            "assertion": "Cleanup DELETE returns 200",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 432
+    },
+    "failures": [],
+    "error": null
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="RoBenDevs Day 08 - Advanced API Assessment" tests="3" time="3.263">
+  <testsuite name="04 - Data Driven Tests / DDT-01 - Filter Pets by CSV Status" id="461b8be1-c70a-4609-baba-2f6179861233" timestamp="2026-11-17T11:04:14.566Z" tests="3" failures="0" errors="0" time="1.088">
+    <testcase name="Expected HTTP code" time="1.080" classname="RoBenDevsDay08AdvancedApiAssessment"/>
+    <testcase name="Response is an array" time="1.080" classname="RoBenDevsDay08AdvancedApiAssessment"/>
+    <testcase name="Pets match requested status" time="1.080" classname="RoBenDevsDay08AdvancedApiAssessment"/>
+  </testsuite>
+</testsuites>

@@ -1,0 +1,1159 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "7b807bf2-b027-4499-80f7-e424bde23f11",
+        "name": "05 - Request Chaining",
+        "item": [
+          {
+            "id": "a903394e-8d79-41de-a3ff-03a635bc8364",
+            "name": "CHAIN-01 - Create Pet and Save ID",
+            "request": {
+              "url": {
+                "path": [
+                  "pet"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Assessment Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "id": "33a217d0-74e9-45f8-afc6-60a5a26665f6",
+                  "type": "text/javascript",
+                  "exec": [
+                    "// A fresh temporary ID per run; shared by the chained requests.",
+                    "pm.collectionVariables.set('day08PetId', String(Date.now()));"
+                  ]
+                }
+              },
+              {
+                "listen": "test",
+                "script": {
+                  "id": "e0a108f5-a7b4-4345-af9d-e3aebdbe1368",
+                  "type": "text/javascript",
+                  "exec": [
+                    "const pet = pm.response.json();",
+                    "pm.test(\"Create returns 200\", () => pm.response.to.have.status(200));",
+                    "pm.test(\"Pet ID and name are returned\", () => {",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.name).to.eql(\"Day 08 Assessment Pet\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "b48da0ba-5384-42d7-9303-eb2fa3bce4e4",
+            "name": "CHAIN-02 - Get Pet By Saved ID",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "aed902c5-33a4-428e-a3c5-6da8325b988e",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"GET returns 200\", () => pm.response.to.have.status(200));",
+                    "pm.test(\"GET retrieves same pet\", () => {",
+                    "  const pet=pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.name).to.eql(\"Day 08 Assessment Pet\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "5bca240f-b876-42df-a009-c5e6b02ff97b",
+            "name": "CHAIN-03 - Delete Assessment Pet",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "DELETE"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "6d2208d6-ed55-49f1-8e83-9dff265fcbaa",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"DELETE returns 200\", () => pm.response.to.have.status(200));"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "7562f9cf-27e3-483e-920b-3e4fb64c70c9",
+        "name": "06 - JSON Schema Validation",
+        "item": [
+          {
+            "id": "e4a6f9f4-e333-42a7-945f-cb8939780953",
+            "name": "SCHEMA-01 - Validate Available Pet List",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "findByStatus"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "available"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "c455f6aa-8e7b-4b2c-be8a-cf69e485c629",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Response is 200\", () => pm.response.to.have.status(200));",
+                    "const schema = {type:\"array\",items:{type:\"object\",properties:{",
+                    "  id:{type:\"integer\"},name:{type:\"string\"},",
+                    "  photoUrls:{type:\"array\",items:{type:\"string\"}},",
+                    "  status:{type:\"string\"}",
+                    "}}};",
+                    "pm.test(\"Response matches JSON Schema\", () => pm.response.to.have.jsonSchema(schema));",
+                    "pm.test(\"All returned pets are available\", () => {",
+                    "  pm.response.json().forEach(pet => pm.expect(pet.status).to.eql(\"available\"));",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "a8306955-4541-46bc-a9fa-c08989d6382b",
+        "name": "04 - Data Driven Tests",
+        "item": [
+          {
+            "id": "80e1f0ef-643f-4952-972d-4f93a78c1de4",
+            "name": "DDT-01 - Filter Pets by CSV Status",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "findByStatus"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [
+                  {
+                    "key": "status",
+                    "value": "{{status}}"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "995aa646-b88f-4099-b0e5-c78d8eee9cca",
+                  "type": "text/javascript",
+                  "exec": [
+                    "const status=pm.iterationData.get(\"status\") || pm.variables.get(\"status\");",
+                    "const expectedCode=Number(pm.iterationData.get(\"expectedCode\") || pm.variables.get(\"expectedCode\"));",
+                    "pm.test(\"Expected HTTP code\", () => pm.response.to.have.status(expectedCode));",
+                    "pm.test(\"Response is an array\", () => pm.expect(pm.response.json()).to.be.an(\"array\"));",
+                    "pm.test(\"Pets match requested status\", () => {",
+                    "  pm.response.json().forEach(pet => pm.expect(pet.status).to.eql(status));",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "02c503f5-3fbf-48b9-aa44-80bc02e37865",
+        "name": "07 - Idempotency Testing",
+        "item": [
+          {
+            "id": "afbdfe23-9b4c-4add-93c2-5d36918c66a1",
+            "name": "IDEM-01 - Repeat Identical PUT (run twice)",
+            "request": {
+              "url": {
+                "path": [
+                  "pet"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "PUT",
+              "body": {
+                "mode": "raw",
+                "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Assessment Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+                "options": {
+                  "raw": {
+                    "language": "json"
+                  }
+                }
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "3c8658a9-c6e6-41ad-b5b4-3b7cc019d6bd",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"PUT returns 200\", () => pm.response.to.have.status(200));",
+                    "pm.test(\"ID and status match request\", () => {",
+                    "  const pet=pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.status).to.eql(\"sold\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "885027af-3005-49da-b9c8-ab491faec976",
+            "name": "IDEM-02 - Verify Final Pet State",
+            "request": {
+              "url": {
+                "path": [
+                  "pet",
+                  "{{day08PetId}}"
+                ],
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "b9410370-70dd-444e-8a69-2f4216913bcf",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Final pet status is sold\", () => {",
+                    "  pm.response.to.have.status(200);",
+                    "  const pet=pm.response.json();",
+                    "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                    "  pm.expect(pet.status).to.eql(\"sold\");",
+                    "});"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "c3a9286a-b259-42e2-b85f-b83306fac455",
+        "name": "09 - Authorization Testing (Local Lab)",
+        "item": [
+          {
+            "id": "36c6e864-4c31-4629-ba96-83ceba63f3ec",
+            "name": "AUTHZ-01 - User A reads own profile",
+            "request": {
+              "url": {
+                "path": [
+                  "users",
+                  "user-a"
+                ],
+                "host": [
+                  "{{authBaseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer demo-token-a"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "d39def58-078c-45ed-b921-27c1d4cf7496",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Own profile accessible\", () => {",
+                    "  pm.response.to.have.status(200);",
+                    "  pm.expect(pm.response.json().id).to.eql(\"user-a\");",
+                    "});"
+                  ],
+                  "_lastExecutionId": "6d1708e6-bc07-4e6c-86f6-4896dc40d105"
+                }
+              }
+            ]
+          },
+          {
+            "id": "45be5ad9-4ecd-438b-b0f4-cbc11d78b8e3",
+            "name": "AUTHZ-02 - User A denied access to User B",
+            "request": {
+              "url": {
+                "path": [
+                  "users",
+                  "user-b"
+                ],
+                "host": [
+                  "{{authBaseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer demo-token-a"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "45934baf-5cf1-41b6-af6d-4ee83703e11c",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Other user's profile is forbidden\", () => pm.response.to.have.status(403));"
+                  ],
+                  "_lastExecutionId": "30dab738-1c3c-415e-beab-230c981e27f9"
+                }
+              }
+            ]
+          },
+          {
+            "id": "a10b400c-e0d8-4118-96c7-c440831e9842",
+            "name": "AUTHZ-03 - No token is unauthorized",
+            "request": {
+              "url": {
+                "path": [
+                  "users",
+                  "user-a"
+                ],
+                "host": [
+                  "{{authBaseUrl}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "56db7803-6592-465f-81d5-69528f3a6782",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test(\"Missing token returns 401\", () => pm.response.to.have.status(401));"
+                  ],
+                  "_lastExecutionId": "296bb11c-5cd5-4fec-84af-bf6f3a7f926b"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [],
+    "variable": [
+      {
+        "type": "any",
+        "value": "https://petstore.swagger.io/v2",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "http://127.0.0.1:3001",
+        "key": "authBaseUrl"
+      },
+      {
+        "type": "any",
+        "value": "",
+        "key": "day08PetId"
+      },
+      {
+        "type": "any",
+        "value": "available",
+        "key": "status"
+      },
+      {
+        "type": "any",
+        "value": "200",
+        "key": "expectedCode"
+      }
+    ],
+    "info": {
+      "_postman_id": "4e432d3c-caa1-4d9b-8f8b-9605d5f17bae",
+      "name": "RoBenDevs Day 08 - Advanced API Assessment",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Supplementary Day 08 extension to Day 07 Petstore baseline. Public Petstore and local-only authorization requests; run selected folders separately, see assessment.md. Do not run writes against production.",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2026-11-17T00:00:00.000Z",
+      "postman_exported_using": "Assessment preparation"
+    },
+    "id": "day08-demo-public",
+    "name": "Day 08 - Petstore Demo",
+    "values": [
+      {
+        "type": "any",
+        "value": "https://petstore.swagger.io/v2",
+        "key": "baseUrl"
+      },
+      {
+        "type": "any",
+        "value": "http://127.0.0.1:3001",
+        "key": "authBaseUrl"
+      }
+    ]
+  },
+  "globals": {
+    "id": "6ffcf7a0-111c-413a-ba7d-47683548d05f",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "testScripts": {
+        "total": 3,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 0,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 7.333333333333333,
+      "responseMin": 4,
+      "responseMax": 12,
+      "responseSd": 3.39934634239519,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1794912854841,
+      "completed": 1794912855050
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 3,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "514361ab-ac26-433d-9deb-fb488ee3464d",
+          "httpRequestId": "309e51a4-35ef-460a-af4e-fa5bfd3d7773"
+        },
+        "item": {
+          "id": "36c6e864-4c31-4629-ba96-83ceba63f3ec",
+          "name": "AUTHZ-01 - User A reads own profile",
+          "request": {
+            "url": {
+              "path": [
+                "users",
+                "user-a"
+              ],
+              "host": [
+                "{{authBaseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer demo-token-a"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "d39def58-078c-45ed-b921-27c1d4cf7496",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Own profile accessible\", () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().id).to.eql(\"user-a\");",
+                  "});"
+                ],
+                "_lastExecutionId": "6d1708e6-bc07-4e6c-86f6-4896dc40d105"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3001",
+            "path": [
+              "users",
+              "user-a"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer demo-token-a"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "79de39f3-7b9c-42f3-953b-f9adeee1696d",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3001",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "bafe3eb3-051c-4eb7-80a7-2f02ce1a249c",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-store"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 10:54:14 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              117,
+              115,
+              101,
+              114,
+              45,
+              97,
+              34,
+              44,
+              34,
+              100,
+              105,
+              115,
+              112,
+              108,
+              97,
+              121,
+              78,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              68,
+              101,
+              109,
+              111,
+              32,
+              85,
+              115,
+              101,
+              114,
+              32,
+              65,
+              34,
+              44,
+              34,
+              114,
+              111,
+              108,
+              101,
+              34,
+              58,
+              34,
+              99,
+              117,
+              115,
+              116,
+              111,
+              109,
+              101,
+              114,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 12,
+          "responseSize": 61
+        },
+        "id": "36c6e864-4c31-4629-ba96-83ceba63f3ec",
+        "assertions": [
+          {
+            "assertion": "Own profile accessible",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "594627a6-c9f3-44a4-aff1-11b92474a5d4",
+          "length": 3,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "01ec8178-7747-4998-8686-46af59966a75"
+        },
+        "item": {
+          "id": "45be5ad9-4ecd-438b-b0f4-cbc11d78b8e3",
+          "name": "AUTHZ-02 - User A denied access to User B",
+          "request": {
+            "url": {
+              "path": [
+                "users",
+                "user-b"
+              ],
+              "host": [
+                "{{authBaseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer demo-token-a"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "45934baf-5cf1-41b6-af6d-4ee83703e11c",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Other user's profile is forbidden\", () => pm.response.to.have.status(403));"
+                ],
+                "_lastExecutionId": "30dab738-1c3c-415e-beab-230c981e27f9"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3001",
+            "path": [
+              "users",
+              "user-b"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer demo-token-a"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "55c534fa-d546-40c6-ba6e-a7a5140f22c7",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3001",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "a08b80cd-5d16-4302-8395-b1353adef198",
+          "status": "Forbidden",
+          "code": 403,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-store"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 10:54:14 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              65,
+              99,
+              99,
+              101,
+              115,
+              115,
+              32,
+              100,
+              101,
+              110,
+              105,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 6,
+          "responseSize": 27
+        },
+        "id": "45be5ad9-4ecd-438b-b0f4-cbc11d78b8e3",
+        "assertions": [
+          {
+            "assertion": "Other user's profile is forbidden",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "dc1ba9de-95fd-4cd2-8f38-59909e277570",
+          "length": 3,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "239ee27a-a034-4d7d-a9b1-60bbf05ace2d"
+        },
+        "item": {
+          "id": "a10b400c-e0d8-4118-96c7-c440831e9842",
+          "name": "AUTHZ-03 - No token is unauthorized",
+          "request": {
+            "url": {
+              "path": [
+                "users",
+                "user-a"
+              ],
+              "host": [
+                "{{authBaseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "56db7803-6592-465f-81d5-69528f3a6782",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Missing token returns 401\", () => pm.response.to.have.status(401));"
+                ],
+                "_lastExecutionId": "296bb11c-5cd5-4fec-84af-bf6f3a7f926b"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "http",
+            "port": "3001",
+            "path": [
+              "users",
+              "user-a"
+            ],
+            "host": [
+              "127",
+              "0",
+              "0",
+              "1"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.24.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "679c6d83-c9e2-4d9d-a241-c429fb86bf68",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "127.0.0.1:3001",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "8bb9ab24-616b-4f63-b995-85c40d5e37a3",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-store"
+            },
+            {
+              "key": "Date",
+              "value": "Tue, 17 Nov 2026 10:54:15 GMT"
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "key": "Keep-Alive",
+              "value": "timeout=5"
+            },
+            {
+              "key": "Transfer-Encoding",
+              "value": "chunked"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              65,
+              117,
+              116,
+              104,
+              101,
+              110,
+              116,
+              105,
+              99,
+              97,
+              116,
+              105,
+              111,
+              110,
+              32,
+              114,
+              101,
+              113,
+              117,
+              105,
+              114,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 4,
+          "responseSize": 37
+        },
+        "id": "a10b400c-e0d8-4118-96c7-c440831e9842",
+        "assertions": [
+          {
+            "assertion": "Missing token returns 401",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 125
+    },
+    "failures": [],
+    "error": null
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="RoBenDevs Day 08 - Advanced API Assessment" tests="1" time="2.231">
+  <testsuite name="06 - JSON Schema Validation / SCHEMA-01 - Validate Available Pet List" id="b5cf5bdc-4a75-4353-936e-1ed3bff1287d" timestamp="2026-11-17T10:56:13.372Z" tests="3" failures="0" errors="0" time="2.231">
+    <testcase name="Response is 200" time="2.231" classname="RoBenDevsDay08AdvancedApiAssessment"/>
+    <testcase name="Response matches JSON Schema" time="2.231" classname="RoBenDevsDay08AdvancedApiAssessment"/>
+    <testcase name="All returned pets are available" time="2.231" classname="RoBenDevsDay08AdvancedApiAssessment"/>
+  </testsuite>
+</testsuites>
