@@ -1,0 +1,137 @@
+# Day 08 — Extra Learning and Practical Progress (So Far)
+
+**Programme:** RoBenDevs QA Engineer Internship — 14-Day Foundation Programme  
+**Date:** 17 November 2026  
+**Focus:** Data-driven API testing with Postman CSV data and Postman CLI  
+**Curriculum mapping:** Day 08 **Intermediate** — data-driven tests; command-line test execution
+
+> This file records learning and work discussed so far. Do not mark a specific assertion PASS without checking the actual command-line run output.
+
+## 1. What I practiced today
+
+1. Reused the Day 07 Swagger Petstore collection instead of recreating it.
+2. Added a dedicated folder called `04 - Data Driven Tests` and a request named `DDT-01 - Filter Pets by Status`.
+3. Prepared a CSV file with three valid status values and their expected HTTP status codes.
+4. Learned how a CSV **data variable** changes one request across multiple iterations.
+5. Tried to load the CSV in Postman Desktop Collection Runner and found that the current Free plan displayed an **upgrade-required** dialog for data files.
+6. Used the already installed **Postman CLI** to execute the local Postman YAML request with CSV data, without upgrading.
+7. Learned that the local multi-protocol collection supported the **`cli` reporter**, not the `html,json` reporters in the attempted command.
+8. Reviewed the difference between a request, an iteration and an assertion.
+
+## 2. Test data
+
+**Local file path:** `api-tests/data/pet-status.csv`
+
+```csv
+status,expectedCode
+available,200
+pending,200
+sold,200
+```
+
+The CSV contains **two columns** and **three data rows**. Each data row gives the API request a new status filter and provides the expected response status.
+
+## 3. Parameterized request
+
+**Method:** `GET`  
+**Endpoint:**
+
+```http
+https://petstore.swagger.io/v2/pet/findByStatus?status={{status}}
+```
+
+Postman replaces `{{status}}` with the current CSV row's value.
+
+| Iteration | Input from CSV | Expected HTTP status |
+| --- | --- | --- |
+| 1 | `available` | 200 |
+| 2 | `pending` | 200 |
+| 3 | `sold` | 200 |
+
+## 4. Data-driven assertions
+
+A reusable test script reads the CSV row using `pm.iterationData`. The following is the intended DDT-01 assertion logic; compare it with the actual saved request before claiming it was executed unchanged:
+
+```javascript
+const status = pm.iterationData.get("status");
+const expectedCode = Number(pm.iterationData.get("expectedCode"));
+
+pm.test(`Status code is ${expectedCode}`, function () {
+    pm.response.to.have.status(expectedCode);
+});
+
+pm.test(`Response is an array for ${status}`, function () {
+    pm.expect(pm.response.json()).to.be.an("array");
+});
+
+pm.test(`All returned pets have status ${status}`, function () {
+    const pets = pm.response.json();
+    pm.expect(pets).to.be.an("array");
+    pets.forEach(function (pet) {
+        pm.expect(pet.status).to.eql(status);
+    });
+});
+```
+
+If three assertions are configured and all three CSV rows run, the suite **should attempt nine assertions**. This is an expected count, not a recorded 9/9 PASS result.
+
+**Note:** The final assertion does not fail for an empty array, because the loop has no entries. To test a minimum-result requirement, add a separate assertion only if the API contract guarantees at least one matching record.
+
+## 5. CLI execution and the issue I resolved
+
+From the repository root, locate the existing request and CSV paths:
+
+```powershell
+$request = Get-ChildItem ".\day-07-api-testing\postman\collections" -Recurse -Filter "DDT-01*.request.yaml" -File |
+    Select-Object -First 1 -ExpandProperty FullName
+
+$csv = ".\day-08-advanced-api-testing\api-tests\data\pet-status.csv"
+
+Write-Host "Request:" $request
+Write-Host "CSV exists:" (Test-Path $csv)
+```
+
+The working command used the **CLI reporter**:
+
+```powershell
+postman.cmd collection run "$request" --iteration-data "$csv" -r cli
+```
+
+### Errors and resolutions
+
+| Observation | Explanation | Resolution |
+| --- | --- | --- |
+| Postman Desktop prompted for a paid plan when selecting CSV data | Data-file uploads were restricted in the user's current Collection Runner plan | Use Postman CLI with the local CSV |
+| `Reporter "html", "json" is not supported for multi-protocol collections` | That reporter combination was unavailable for the local collection format | Rerun with `-r cli` |
+
+A console log can be captured in a future execution using PowerShell `Tee-Object`; rerunning would create new evidence rather than recover the exact previous run.
+
+## 6. Execution evidence and honest results
+
+- **CSV dataset:** 3 rows prepared.
+- **DDT-01 request:** discussed and selected for the run.
+- **Postman CLI:** working; user confirmed the corrected execution command was completed.
+- **Actual request count, assertion pass/fail totals, response times:** **not provided or independently verified in the conversation**. Fill them in only after reading the saved terminal output.
+- **HTML/JSON results for this local YAML run:** not generated by the corrected `-r cli` command.
+
+### Actual-result record — complete from terminal evidence
+
+| Metric | Actual |
+| --- | --- |
+| Iterations | To verify |
+| Requests sent | To verify |
+| Assertions passed | To verify |
+| Assertions failed | To verify |
+| Errors | To verify |
+| CLI console evidence file | Add path if saved |
+
+## 7. What I understood
+
+**Data-driven testing separates data from test logic.** The CSV stores the input and expected result; the Postman request defines the endpoint; the Postman script defines the checks; and the CLI executes each row as a separate iteration. This reduces repeated test definitions and makes it easier to extend coverage with more valid, invalid and boundary inputs.
+
+**Next:** Add a verified negative row only after checking the API contract, then continue Day 08 Intermediate with request chaining and JSON Schema validation. The remaining assignment also requires Newman execution, idempotency and authorization testing in an appropriate environment.
+
+## References
+
+- RoBenDevs QA Engineer Internship — 14-Day Foundation Programme, **Day 08, Intermediate**, page 13.
+- [Postman Learning Center](https://learning.postman.com/)

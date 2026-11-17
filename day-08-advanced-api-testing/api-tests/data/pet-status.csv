@@ -1,0 +1,4 @@
+status,expectedCode
+available,200
+pending,200
+sold,200
