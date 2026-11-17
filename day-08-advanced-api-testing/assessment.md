@@ -6,6 +6,20 @@
 **Reference:** Official Foundation Programme, page 13  
 **Test environments:** Swagger Petstore v2 (public demo); local authorization lab (127.0.0.1:3001); local race-condition lab (127.0.0.1:3000)
 
+## 0. Verified Newman results — 17 November 2026
+
+These are **four separate folder-scoped Newman executions**, evidenced by screenshots of the terminal outputs. The corresponding generated report files are still local until committed/pushed.
+
+| Test area | Requests | Assertions | Failed | Evidence |
+| --- | ---: | ---: | ---: | --- |
+| Authorization (local mock) | 3 | 3 | 0 | AUTHZ-01 200; AUTHZ-02 403; AUTHZ-03 401 |
+| JSON Schema (Petstore) | 1 | 3 | 0 | HTTP 200, JSON Schema PASS, status-filter PASS |
+| Idempotency (Petstore) | 5 | 9 | 0 | POST, identical PUT twice, GET final `sold`, DELETE |
+| CSV data-driven (Petstore) | 3 | 9 | 0 | Three CSV rows, 3.5 s, 0 failures |
+| **Total across these independent runs** | **12** | **24** | **0** | **Not a single end-to-end combined run** |
+
+The final state of the local concurrency lab was also observed as `stock=0`, `orders=1` after the fix; this is separate from the 24 Newman assertions above.
+
 ## 1. Assignment requirement
 
 > Extend the Day 7 collection with environments, chained requests, assertions, schema checks and a data-driven test. Run it with Newman and include one idempotency and one authorisation test.
@@ -19,15 +33,15 @@ This assessment separates **verified executions** from **examples created but st
 | Requirement / activity | Actual evidence | Status |
 | --- | --- | --- |
 | Existing Day 7 API testing baseline | Existing 25-request JSON collection is retained in `day-07-api-testing/postman-collection` | Retained |
-| Postman environments | `api-tests/day08-demo.postman_environment.json` added with public demo `baseUrl` and local `authBaseUrl` | Configuration created; switching run pending |
+| Postman environments | `api-tests/day08-demo.postman_environment.json` used by Newman against Petstore and the local authorization lab | **Verified** in separate runs |
 | Chained create/read/delete | Existing Local View Postman folder `05 - Request Chaining` and added Day 8 runnable collection | Configured; full clean execution not verified |
 | Assertions | HTTP status, response JSON shape, IDs and business values tested during exercises | Practiced |
-| JSON Schema | A runnable `SCHEMA-01` was added in the assessment collection | Configured; execution pending |
+| JSON Schema | Newman execution screenshot: 1 request, 3/3 assertions passed; JSON and JUnit files generated | **Verified** |
 | CSV-driven API test | Saved Postman CLI log from local YAML collection, `status = available/pending/sold` | **3 iterations, 3 requests, 9/9 assertions PASS** |
 | Newman in CI | Separate `ci-smoke.postman_collection.json` and GitHub Actions workflow; job screenshot showed success in 19 seconds | **Smoke CI run succeeded**; detailed assertion log not checked |
-| Full extended assessment with Newman | `api-tests/day08-assessment.postman_collection.json` prepared | **Still needs execution** |
-| Idempotency | User screenshot showed a PUT with **3/3 PASS**; repeated request and clean GET confirmation not archived | Partial; repeatable evidence needed |
-| Authorization / BOLA | Local-only `authorization-lab.js` and three assessment requests added | Configured; **not run yet** |
+| Full extended assessment with Newman | Four selected folders executed independently: **12 requests and 24/24 assertions passed** | **Verified folder-scoped runs**; no one-shot entire collection run |
+| Idempotency | Newman screenshot: create, first PUT, identical second PUT, final GET and cleanup DELETE | **5 requests, 9/9 assertions PASS** |
+| Authorization / BOLA | Newman screenshot: own profile 200, other user blocked 403, no token 401 | **3 requests, 3/3 assertions PASS** |
 | Concurrency / race condition (additional advanced practical) | Local Node lab and screenshots | **Bug reproduced** (stock -1, orders 2); corrected state observed (stock 0, orders 1) |
 | CP-3 Days 7–8 slides | Not verified as submitted in repository | Pending |
 
@@ -83,7 +97,7 @@ The array-status assertion does not establish nonempty results: a `forEach` over
 
 **Expected:** First PUT 200, second identical PUT 200, GET returns the matching ID and `sold` status. HTTP responses do not need to be byte-identical for the operation to be idempotent.
 
-**Observed so far:** A user-provided screenshot showed one PUT response returning 200 with **3/3 assertions passed**, including ID and status. The second identical PUT and final GET need to be documented as a clean run in the assessment export.
+**Observed now:** The later Newman run executed setup POST, two identical PUT requests, final GET, and cleanup DELETE successfully: **5 requests, 9/9 assertions PASS**. Earlier manual evidence also showed one PUT with 3/3 PASS.
 
 **Execution note:** Create a disposable pet with `CHAIN-01`, execute `IDEM-01` **twice without changing its body**, execute `IDEM-02` once, then clean up with `CHAIN-03`. Because Postman/Newman folder runs do not themselves repeat a single request twice, **do not claim a one-pass folder run proves idempotency**.
 
@@ -103,7 +117,7 @@ The intended checks:
 | **AUTHZ-02** | **User A** | **User B profile** | **403 Forbidden** |
 | AUTHZ-03 | No token | User A profile | 401 Unauthorized |
 
-**Current status:** The local test server and Postman test requests are **prepared but have not been executed**. These demo tokens are hardcoded learning fixtures, not real authentication credentials. The lab exercises object-level authorization rules locally; it is not a security finding against Swagger Petstore.
+**Current status:** Executed against the local-only lab with Newman; **3/3 assertions PASS** (HTTP 200, 403, 401). These demo tokens are hardcoded learning fixtures, not real authentication credentials. The lab exercises object-level authorization rules locally; it is not a security finding against Swagger Petstore.
 
 ## 8. Newman execution instructions
 
@@ -164,7 +178,7 @@ newman.cmd run "$collection" -e "$environment" --folder "09 - Authorization Test
 2. **Positive verified result:** GitHub Actions ran the standalone Newman smoke-test workflow successfully; the job reported completion in **19 seconds**.
 3. **Demonstrated defect:** The intentionally vulnerable local inventory endpoint oversold one item, demonstrating why concurrency assertions matter.
 4. **Corrected behavior observed:** Local safe purchase endpoint preserved inventory (`stock=0`, `orders=1`).
-5. **Current gap:** Standalone Day 8 schema, authorization, and overall assessment collection have **not yet been executed with Newman**. Results must be captured before final completion is claimed.
+5. **Resolved:** Schema, authorization, idempotency and data-driven folders have each been executed with Newman: **24/24 assertions PASS** across four separate runs. Evidence reports need to be committed from the local workstation.
 6. **Current gap:** The updated collection is separate from the original Day 7 JSON export; merge into one collection if required by the trainer.
 7. **Current gap:** CP-3 slides for Days 7–8 and a final assessment report are still to be confirmed.
 
@@ -176,10 +190,10 @@ newman.cmd run "$collection" -e "$environment" --folder "09 - Authorization Test
 - [x] Preserve verified CLI CSV log (9/9).
 - [x] Include local concurrency lab and verified before/after inventory observations.
 - [x] Set up GitHub Actions for a read-only Newman smoke test.
-- [ ] Run new schema folder with Newman and review actual result.
-- [ ] Run new authorization folder against local mock server and review actual result.
-- [ ] Verify repeated identical PUT and final GET, then delete the test pet.
-- [ ] Commit Newman JSON/XML reports from actual assessment runs.
+- [x] Run schema folder with Newman: **3/3 PASS** (JSON and JUnit reports generated locally).
+- [x] Run authorization folder with Newman against local mock API: **3/3 PASS** (JSON report generated locally).
+- [x] Verify two identical PUTs, final GET and cleanup DELETE with Newman: **9/9 PASS**.
+- [ ] Commit locally generated Newman JSON/XML reports from all four assessment runs after checking them for sensitive data.
 - [ ] Export a combined Day 7 + Day 8 collection if requested by trainer.
 - [ ] Prepare CP-3 slides for Days 7–8 and place them under `presentations`.
 
