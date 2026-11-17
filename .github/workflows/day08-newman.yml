@@ -1,0 +1,47 @@
+name: Day 08 - Newman API Smoke Test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'day-08-advanced-api-testing/api-tests/ci-smoke.postman_collection.json'
+      - '.github/workflows/day08-newman.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  api-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Newman
+        run: npm install --global newman
+
+      - name: Prepare report directory
+        run: mkdir -p day-08-advanced-api-testing/reports/ci
+
+      - name: Run read-only Petstore smoke test
+        run: |
+          newman run day-08-advanced-api-testing/api-tests/ci-smoke.postman_collection.json \
+            --reporters cli,junit,json \
+            --reporter-junit-export day-08-advanced-api-testing/reports/ci/newman-junit.xml \
+            --reporter-json-export day-08-advanced-api-testing/reports/ci/newman-results.json \
+            --timeout-request 15000
+
+      - name: Upload Newman results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: day08-newman-smoke-results
+          path: day-08-advanced-api-testing/reports/ci/
+          if-no-files-found: warn
