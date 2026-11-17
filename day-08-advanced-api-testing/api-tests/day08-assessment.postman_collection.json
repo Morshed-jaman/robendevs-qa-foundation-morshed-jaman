@@ -34,7 +34,12 @@
           "name": "CHAIN-01 - Create Pet and Save ID",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/pet",
             "body": {
               "mode": "raw",
@@ -185,14 +190,65 @@
       "name": "07 - Idempotency Testing",
       "item": [
         {
-          "name": "IDEM-01 - Repeat Identical PUT (run twice)",
+          "name": "IDEM-00 - Create Disposable Pet",
           "request": {
-            "method": "PUT",
-            "header": [],
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{baseUrl}}/pet",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Assessment Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"available\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set(\"day08PetId\", String(Date.now()));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Pet setup returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Pet created with expected ID\", function () {",
+                  "  const pet=pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IDEM-01A - First PUT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pet",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -206,9 +262,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"PUT returns 200\", () => pm.response.to.have.status(200));",
-                  "pm.test(\"ID and status match request\", () => {",
-                  "  const pet=pm.response.json();",
+                  "pm.test(\"PUT returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PUT returns correct ID and sold status\", function () {",
+                  "  const pet = pm.response.json();",
                   "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
                   "  pm.expect(pet.status).to.eql(\"sold\");",
                   "});"
@@ -218,7 +274,45 @@
           ]
         },
         {
-          "name": "IDEM-02 - Verify Final Pet State",
+          "name": "IDEM-01B - Second Identical PUT",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pet",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": {{day08PetId}},\n  \"name\": \"Day 08 Idempotency Pet\",\n  \"photoUrls\": [],\n  \"status\": \"sold\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"PUT returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"PUT returns correct ID and sold status\", function () {",
+                  "  const pet = pm.response.json();",
+                  "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.status).to.eql(\"sold\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IDEM-02 - Verify Final State",
           "request": {
             "method": "GET",
             "header": [],
@@ -230,12 +324,32 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Final pet status is sold\", () => {",
-                  "  pm.response.to.have.status(200);",
-                  "  const pet=pm.response.json();",
+                  "pm.test(\"Final GET returns 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Final pet state has same ID and sold status\", function () {",
+                  "  const pet = pm.response.json();",
                   "  pm.expect(pet.id).to.eql(Number(pm.collectionVariables.get(\"day08PetId\")));",
+                  "  pm.expect(pet.name).to.eql(\"Day 08 Idempotency Pet\");",
                   "  pm.expect(pet.status).to.eql(\"sold\");",
                   "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "IDEM-03 - Delete Disposable Pet",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/pet/{{day08PetId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Cleanup DELETE returns 200\", function () { pm.response.to.have.status(200); });"
                 ]
               }
             }
