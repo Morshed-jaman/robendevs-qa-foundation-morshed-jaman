@@ -1,0 +1,120 @@
+{
+  "environment": "SQLite in-memory, synthetic seeded dataset",
+  "method": "SQL-simulated application actions; no live UI/API used",
+  "actions": [
+    {
+      "test_id": "A01",
+      "action": "Register customer",
+      "expected": {
+        "customer_id": 10,
+        "name": "Test User",
+        "email": "test.user@test.example"
+      },
+      "actual": {
+        "customer_id": 10,
+        "name": "Test User",
+        "email": "test.user@test.example"
+      },
+      "active_order_count": null,
+      "status": "PASS"
+    },
+    {
+      "test_id": "A02",
+      "action": "Update customer profile",
+      "expected": {
+        "customer_id": 10,
+        "name": "Test User Updated",
+        "email": "test.user@test.example"
+      },
+      "actual": {
+        "customer_id": 10,
+        "name": "Test User Updated",
+        "email": "test.user@test.example"
+      },
+      "active_order_count": null,
+      "status": "PASS"
+    },
+    {
+      "test_id": "A03",
+      "action": "Create order",
+      "expected": {
+        "order_id": 201,
+        "customer_id": 10,
+        "amount": 400,
+        "status": "pending"
+      },
+      "actual": {
+        "order_id": 201,
+        "customer_id": 10,
+        "amount": 400,
+        "status": "pending"
+      },
+      "active_order_count": null,
+      "status": "PASS"
+    },
+    {
+      "test_id": "A04",
+      "action": "Mark order paid",
+      "expected": {
+        "order_id": 201,
+        "customer_id": 10,
+        "amount": 400,
+        "status": "paid"
+      },
+      "actual": {
+        "order_id": 201,
+        "customer_id": 10,
+        "amount": 400,
+        "status": "paid"
+      },
+      "active_order_count": null,
+      "status": "PASS"
+    },
+    {
+      "test_id": "A05",
+      "action": "Soft-delete order",
+      "expected": {
+        "order_id": 201,
+        "deleted_at": "2026-11-19 12:00:00"
+      },
+      "actual": {
+        "order_id": 201,
+        "deleted_at": "2026-11-19 12:00:00"
+      },
+      "active_order_count": 0,
+      "status": "PASS"
+    }
+  ],
+  "integrity_findings": [
+    {
+      "issue_id": "D01",
+      "issue": "Duplicate customer email",
+      "rows": [
+        {
+          "email": "rahim@test.example",
+          "duplicate_count": 2
+        }
+      ]
+    },
+    {
+      "issue_id": "D02",
+      "issue": "Orphan order",
+      "rows": [
+        {
+          "order_id": 104,
+          "customer_id": 99
+        }
+      ]
+    },
+    {
+      "issue_id": "D03",
+      "issue": "Missing order status",
+      "rows": [
+        {
+          "order_id": 105,
+          "status": null
+        }
+      ]
+    }
+  ]
+}
