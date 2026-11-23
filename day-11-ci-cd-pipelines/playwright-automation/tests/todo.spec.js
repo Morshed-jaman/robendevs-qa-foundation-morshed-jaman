@@ -13,7 +13,7 @@ test('Add a todo @smoke', async ({ page }) => {
   await input.press('Enter');
 
   await expect(page.getByTestId('todo-title'))
-    .toHaveText(['Wrong Task Name']);
+    .toHaveText(['Learn Playwright']);
 });
 
 // TEST 02 — Regression
