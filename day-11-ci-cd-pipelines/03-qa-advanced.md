@@ -2,12 +2,13 @@
 
 **Programme:** RoBenDevs QA Engineer Internship — 14-Day Foundation Programme  
 **Study date:** 20 November 2026  
+**Practical evidence updated:** 23 November 2026  
 **Topic:** CI/CD and Automation in the Pipeline  
 **Level:** Advanced  
 **Source:** Official Foundation Programme, Day 11, page 16  
 **Previous lessons:** [01 — Basic](01-qa-basic.md) · [02 — Intermediate](02-qa-intermediate.md)
 
-> **Learning notes, not a completed pipeline assessment.** The YAML and commands below are teaching examples for a Bitbucket Cloud repository. This learning repository is on GitHub, and the Day 10 Playwright suite is not yet implemented in a runnable `automation/` project. No passing Bitbucket pipeline, blocked merge, production deployment or verified deployment smoke test is claimed.
+> **Study material and verified GitHub practice—not a completed Bitbucket assessment.** The repository contains a runnable Playwright TodoMVC suite at `day-11-ci-cd-pipelines/playwright-automation/` and a GitHub Actions workflow at `.github/workflows/day11-qa-ci.yml`. A successful Playwright + Newman CI run and merge-blocking quality-gate experiment have been verified. The Bitbucket YAML below remains illustrative; no Bitbucket pipeline or production/staging deployment has been executed as part of this work.
 
 ## 1. Advanced learning objectives
 
@@ -59,7 +60,7 @@ For enforced merge protection, authorized repository/workspace administrators mu
 - No known critical production-blocking defects are left without approved mitigation.
 - Test evidence and release decisions are documented.
 
-### 2.2 Illustrative PR pipeline (not yet runnable here)
+### 2.2 Illustrative Bitbucket PR pipeline (not implemented in this repository)
 
 ```yaml
 pipelines:
@@ -71,9 +72,21 @@ pipelines:
             - echo "Run required, real validation commands here"
 ```
 
-**Reminder:** An `echo` command is **not a test** and cannot demonstrate a passing quality gate. Replace it with verified commands after the Day 10 Playwright project is built. A passing status becomes a merge blocker only with the correct Bitbucket merge rules.
+**Reminder:** An `echo` command is **not a test** and cannot demonstrate a passing quality gate. A real Bitbucket submission must replace it with tested commands for the Newman collection and Playwright suite. A passing status becomes a merge blocker only with the correct Bitbucket merge rules.
 
 **QA responsibilities:** Define meaningful tests, investigate failure evidence, and communicate release risk; do not simply mark a failing test as passed.
+
+### 2.3 Verified GitHub quality-gate practical (23 November 2026)
+
+This section records the actual GitHub Actions experiment, separate from the Bitbucket examples above.
+
+1. Configured a GitHub ruleset for `main` requiring pull requests, up-to-date branches, and two successful checks: `Playwright - Chromium` and `Newman - API smoke`. Force pushes and branch deletion were blocked.
+2. Opened [practice Pull Request #1](https://github.com/Morshed-jaman/robendevs-qa-foundation-morshed-jaman/pull/1). Both checks passed, allowing the merge.
+3. Deliberately changed the first TodoMVC test expectation from `Learn Playwright` to `Wrong Task Name`. Playwright failed; Newman passed. The required failing check disabled merging.
+4. Restored `Learn Playwright` and pushed the fix. Pull Request #1 was subsequently merged, and the original assertion is present on `main`.
+5. The ruleset was later deleted after the practice; its settings and the test evidence were retained in [the ruleset evidence file](assessment/quality-gate-ruleset-evidence.md). **The branch is no longer protected by that practice ruleset.**
+
+**Learning:** The test framework reports the failure; the repository's enforced merge rules decide whether the change can be merged. The intentional failure was a test of the quality gate, not a defect in TodoMVC.
 
 ## 3. Post-deployment smoke testing
 
@@ -122,7 +135,7 @@ curl --fail --silent --show-error "$STAGING_BASE_URL/health"
 
 This assumes a real, documented `/health` endpoint exists and that `STAGING_BASE_URL` is properly configured. A successful health endpoint alone **does not prove complete application readiness**.
 
-A Bitbucket deployment step can be followed by a separate smoke-test step once valid deployment scripts and environment access are available.
+A Bitbucket deployment step can be followed by a separate smoke-test step once valid deployment scripts and environment access are available. **Practical status:** No actual application deployment or post-deployment smoke test was performed in this Day 11 GitHub workflow.
 
 ### 3.3 When a post-deployment smoke test fails
 
@@ -170,6 +183,8 @@ This is illustrative. The referenced script must exist before execution. The env
 
 **Important:** Masked output does not make an unsafe credential safe if an artifact still includes it. Review reports and traces before sharing.
 
+**Practical status:** Secured CI credentials and environment variables have been studied but not verified in a completed hands-on run; do not mark them complete.
+
 ## 5. Pipeline speed: parallel steps
 
 **Parallel execution** runs independent jobs at the same time instead of waiting for each job to finish.
@@ -201,6 +216,15 @@ pipelines:
 
 **QA check:** Ensure tests do not fail merely because independent jobs execute simultaneously.
 
+### 5.2 Verified independent GitHub Actions jobs
+
+The actual [Day 11 workflow](https://github.com/Morshed-jaman/robendevs-qa-foundation-morshed-jaman/blob/main/.github/workflows/day11-qa-ci.yml) defines two independent jobs:
+
+- `Playwright - Chromium`: installs the Playwright project dependencies and Chromium, then runs the three TodoMVC tests.
+- `Newman - API smoke`: installs Newman and runs the Day 08 read-only Swagger Petstore collection.
+
+GitHub Actions can schedule these jobs concurrently because no job-level dependency connects them. The [verified push run](https://github.com/Morshed-jaman/robendevs-qa-foundation-morshed-jaman/actions/runs/45141874922) shows **both jobs succeeded** and their report artifacts were uploaded. This is CI automation; it does not deploy an application.
+
 ## 6. Playwright sharding: splitting one suite across jobs
 
 **Sharding** divides the tests from one Playwright suite into separate subsets.
@@ -221,6 +245,8 @@ Both commands must run (commonly in separate pipeline steps) for the entire suit
 - Each shard produces its own reports or blob artifacts.
 - Merge reporting output deliberately if a single consolidated report is required.
 - More parallel jobs do not always mean faster total work if tests contend on the same services.
+
+**Practical status:** Sharding syntax is covered here, but executing and collecting results from both shards in CI is still pending.
 
 ## 7. Practical CI/CD QA strategy
 
@@ -244,16 +270,22 @@ The programme asks for:
 5. A pull request with the pipeline file and diagram.
 6. A link to a **real, passing** pipeline run.
 
-**Existing learning material:**
-- Day 08 API tests: `../day-08-advanced-api-testing/api-tests/`
-- Day 10 browser automation study: `../day-10-browser-automation/` (currently notes only)
+**Existing learning and practice material:**
+- Day 08 API tests: `../day-08-advanced-api-testing/api-tests/`.
+- Day 10 browser automation study notes: `../day-10-browser-automation/`.
+- Runnable Playwright practice suite: `playwright-automation/tests/todo.spec.js` in Day 11 (not under the Day 10 path specified by the official assessment).
+- GitHub CI: `../.github/workflows/day11-qa-ci.yml`.
+- Recorded practical learning: [04-practical-learning-notes.md](04-practical-learning-notes.md).
+- Retained quality-gate evidence: [assessment/quality-gate-ruleset-evidence.md](assessment/quality-gate-ruleset-evidence.md).
 
-**Dependencies before claiming assessment complete:**
-- Implement and run a real Day 10 Playwright suite.
-- Configure a suitable Bitbucket repository and required quality gate.
-- Validate pipeline YAML and test dependencies.
-- Execute actual PR checks and retain a genuine build result.
-- Create and review the pipeline diagram.
+**Still required before claiming the official Bitbucket assessment is complete:**
+- Set up an actual Bitbucket repository and adapt/locate the Playwright suite as the assignment requires.
+- Create and validate a real `bitbucket-pipelines.yml` with Newman and Playwright jobs.
+- Configure and confirm enforced merge checks in Bitbucket.
+- Obtain a genuine passing Bitbucket pipeline run and its artifacts.
+- Draw and review the full CI/CD pipeline diagram and submit the required pull request.
+
+**The GitHub proof is real, but it does not substitute for the requested Bitbucket submission.**
 
 ## 9. QA review questions
 
@@ -270,19 +302,21 @@ The programme asks for:
 
 ## 10. Practice checklist
 
-- [ ] Explain how required merge checks protect a branch.
-- [ ] Distinguish pipeline failure status from an enforced merge gate.
-- [ ] Design a safe staging/production smoke-check strategy.
-- [ ] Identify secured credentials and environment variable scopes.
-- [ ] Explain when parallel jobs help and when they cause conflicts.
-- [ ] Run both halves of a sharded Playwright suite once tests exist.
-- [ ] Prepare a complete, evidence-based Day 11 assessment and pipeline diagram.
+- [x] Demonstrate that required GitHub Actions status checks can block a pull-request merge.
+- [x] Distinguish a failed CI job from an enforced merge check using the actual PR.
+- [x] Run independent Playwright and Newman jobs in GitHub Actions and retain generated artifacts.
+- [x] Save ruleset settings and practical evidence before deleting the practice protection.
+- [ ] Execute a smoke check after a real approved staging deployment.
+- [ ] Configure and validate CI variables and secured test credentials.
+- [ ] Execute both Playwright shards and verify their results.
+- [ ] Complete the official Bitbucket pipeline, diagram, and passing-run submission.
 
-**Current status:** Day 11 Advanced study notes documented. Pipeline configuration, real smoke execution, passing build URL, and assessment submission remain pending.
+**Current status (23 November 2026):** GitHub CI and the merge-blocking quality-gate experiment are verified, including a passing workflow run. The practice ruleset was later deleted. Real deployment smoke checks, hands-on secrets/sharding, and the official Bitbucket assessment remain pending.
 
 ## 11. References
 
 - Official RoBenDevs QA Engineer Internship 14-Day Foundation Programme, Day 11 (page 16).
+- [GitHub CI workflow](https://github.com/Morshed-jaman/robendevs-qa-foundation-morshed-jaman/blob/main/.github/workflows/day11-qa-ci.yml), [verified passing run](https://github.com/Morshed-jaman/robendevs-qa-foundation-morshed-jaman/actions/runs/45141874922), and [quality-gate PR #1](https://github.com/Morshed-jaman/robendevs-qa-foundation-morshed-jaman/pull/1).
 - [Bitbucket — Suggest or require checks before a merge](https://support.atlassian.com/bitbucket-cloud/docs/suggest-or-require-checks-before-a-merge/)
 - [Bitbucket — Variables and secrets](https://support.atlassian.com/bitbucket-cloud/docs/variables-and-secrets/)
 - [Bitbucket — Parallel step options](https://support.atlassian.com/bitbucket-cloud/docs/parallel-step-options/)
