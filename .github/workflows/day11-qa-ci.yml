@@ -1,0 +1,92 @@
+name: Day 11 - Playwright and Newman CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'day-11-ci-cd-pipelines/playwright-automation/**'
+      - 'day-08-advanced-api-testing/api-tests/ci-smoke.postman_collection.json'
+      - '.github/workflows/day11-qa-ci.yml'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  playwright-browser-tests:
+    name: Playwright - Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: day-11-ci-cd-pipelines/playwright-automation
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: day-11-ci-cd-pipelines/playwright-automation/package-lock.json
+
+      - name: Install project dependencies
+        run: npm ci
+
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke and regression tests
+        run: npx playwright test tests/todo.spec.js --project=chromium
+
+      - name: Upload Playwright reports and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: day11-playwright-results
+          path: |
+            day-11-ci-cd-pipelines/playwright-automation/playwright-report/
+            day-11-ci-cd-pipelines/playwright-automation/test-results/
+          if-no-files-found: warn
+          retention-days: 7
+
+  newman-api-tests:
+    name: Newman - API smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Newman
+        run: npm install --global newman
+
+      - name: Prepare results directory
+        run: mkdir -p day-08-advanced-api-testing/reports/ci
+
+      - name: Run Day 08 Petstore smoke collection
+        run: |
+          newman run day-08-advanced-api-testing/api-tests/ci-smoke.postman_collection.json \
+            --reporters cli,junit,json \
+            --reporter-junit-export day-08-advanced-api-testing/reports/ci/newman-junit.xml \
+            --reporter-json-export day-08-advanced-api-testing/reports/ci/newman-results.json \
+            --timeout-request 15000
+
+      - name: Upload Newman reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: day11-newman-results
+          path: day-08-advanced-api-testing/reports/ci/
+          if-no-files-found: warn
+          retention-days: 7
